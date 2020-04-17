@@ -18,7 +18,8 @@ class QuestionPage extends Component {
   state = {
     text: '',
     name: '',
-    rankedScoreArr: [],
+    startedBySocket: false,
+    rankedScoreArr: null,
   };
 
   submitVote = () => {
@@ -41,53 +42,73 @@ class QuestionPage extends Component {
     this.ws = new ReconnectingWebSocket(`ws://127.0.0.1:9001?question=${questionId}&user=${user.id}`);
 
     this.ws.onmessage = ({ data }) => {
-      const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
-      const rankedScoreArr = [];
+      if (data.includes('startitbro')) {
+        this.setState({ startedBySocket: true });
+      } else if (data.indexOf(']') !== -1) {
+        const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
+        const rankedScoreArr = [];
 
-      for (let i = 0; i < scoreArr.length; i += 2) {
-        rankedScoreArr.push([scoreArr[i], scoreArr[i+1]]);
+        for (let i = 0; i < scoreArr.length; i += 2) {
+          rankedScoreArr.push([scoreArr[i], scoreArr[i+1]]);
+        }
+
+        this.setState({ rankedScoreArr })
       }
-
-      this.setState({ rankedScoreArr })
-    };
-
-    this.ws.onopen = function() { // thing to do on open
     };
   }
 
   render() {
     const { question, user } = this.props;
+    const { startedBySocket } = this.state;
 
-    return (
-      <div className="">
-        <header className="">
+    if (!question) {
+      return (<div>loading...</div>);
+    } else {
+      const startTime = new Date(question.start_time);
+      const questionIsActive = startedBySocket || Date.now() >= startTime;
+
+      return (
+        <div className="">
           <p>
-            {question && question.question_text}
+            {question.question_text}
           </p>
 
-          <div>
-            name: <input
-              onChange={e => this.setState({ name: e.target.value })}
-            />
-          </div>
-          <div>
-            text: <input
-              onChange={e => this.setState({ text: e.target.value })}
-            />
-          </div>
-          <button onClick={this.submitVote}>
-            submit
-          </button>
+          { questionIsActive ? this.renderVoting() : this.renderTooEarly() }
 
-          { this.renderScores() }
-        </header>
+        </div>
+      );
+    }
+  }
+
+  renderVoting() {
+    return (
+      <div>
+        <div>
+          name: <input
+            onChange={e => this.setState({ name: e.target.value })}
+          />
+        </div>
+        <div>
+          text: <input
+            onChange={e => this.setState({ text: e.target.value })}
+          />
+        </div>
+        <button onClick={this.submitVote}>
+          submit
+        </button>
+
+        { this.renderScores() }
       </div>
     );
   }
 
+  renderTooEarly() {
+    return (<div>Little early bud</div>);
+  }
+
   renderScores() {
     const { rankedScoreArr } = this.state;
-    return rankedScoreArr.map(([a, b], idx) => (
+    return rankedScoreArr && rankedScoreArr.map(([a, b], idx) => (
       <div key={idx}>{a}: {b}</div>
     ));
   }
