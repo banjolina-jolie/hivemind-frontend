@@ -42,8 +42,15 @@ class QuestionPage extends Component {
     this.ws = new ReconnectingWebSocket(`ws://127.0.0.1:9001?question=${questionId}&user=${user.id}`);
 
     this.ws.onmessage = ({ data }) => {
+      console.log('data')
+      console.log(data)
+      // Maybe combine startitbro and votenextwordbro to just update question
       if (data.includes('startitbro')) {
         this.setState({ startedBySocket: true });
+      } else if (data.includes('winningWord')) {
+        // add word
+        // clear scoreboard
+        debugger;
       } else if (data.indexOf(']') !== -1) {
         const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
         const rankedScoreArr = [];
@@ -81,6 +88,7 @@ class QuestionPage extends Component {
   }
 
   renderVoting() {
+    const { answer } = this.props.question;
     return (
       <div>
         <div>
@@ -96,6 +104,10 @@ class QuestionPage extends Component {
         <button onClick={this.submitVote}>
           submit
         </button>
+
+        <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+        <div>{answer}</div>
+        <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
 
         { this.renderScores() }
       </div>
