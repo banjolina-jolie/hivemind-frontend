@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { useHistory } from "react-router-dom";
+// import { useHistory } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import { fetchQuestion } from './reducer';
+import { fetchQuestion, setNextVotingRound } from './reducer';
 
-function NavButton() {
-  const history = useHistory();
-  return (
-    <button onClick={() => {
-      history.push('/');
-    }}>nav</button>
-  );
-}
+// function NavButton() {
+//   const history = useHistory();
+//   return (
+//     <button onClick={() => {
+//       history.push('/');
+//     }}>nav</button>
+//   );
+// }
 
 class QuestionPage extends Component {
   state = {
@@ -20,6 +20,7 @@ class QuestionPage extends Component {
     name: '',
     startedBySocket: false,
     rankedScoreArr: null,
+    votingRoundEndTime: null,
   };
 
   submitVote = () => {
@@ -29,11 +30,20 @@ class QuestionPage extends Component {
     this.ws.send(str);
   };
 
+  componentWillUnmount() {
+    clearInterval(this.refreshTimer);
+  }
+
   componentDidMount() {
+    clearInterval(this.refreshTimer);
+    this.refreshTimer = setInterval(() => {
+      this.forceUpdate();
+    }, 1000);
     const {
       fetchQuestion,
+      setNextVotingRound,
         match: { params: { questionId } },
-        question,
+        // question,
         user,
       } = this.props;
 
@@ -42,55 +52,83 @@ class QuestionPage extends Component {
     this.ws = new ReconnectingWebSocket(`ws://127.0.0.1:9001?question=${questionId}&user=${user.id}`);
 
     this.ws.onmessage = ({ data }) => {
-      console.log('data')
-      console.log(data)
       // Maybe combine startitbro and votenextwordbro to just update question
-      if (data.includes('startitbro')) {
-        this.setState({ startedBySocket: true });
-      } else if (data.includes('winningWord')) {
-        // add word
-        // clear scoreboard
-        debugger;
+      const isObject = data.indexOf('}') !== -1;
+
+      if (isObject) {
+        const obj = JSON.parse(data.slice(0, data.indexOf('}') + 1)); // cut off weird byte strings at end :/
+        const { votingRoundEndTime } = obj;
+        if (obj.start) {
+          this.setState({ startedBySocket: true,  votingRoundEndTime });
+        } else if (obj.winningWord) {
+          if (obj.winningWord === '<END_SENTENCE>') {
+            console.log('end of voting')
+          } else {
+            console.log('setting next round')
+            console.log('setting next round')
+            console.log('setting next round')
+            setNextVotingRound(obj.winningWord);
+            this.setState({ startedBySocket: true,  votingRoundEndTime });
+          }
+          this.setState({ rankedScoreArr: null });
+        }
       } else if (data.indexOf(']') !== -1) {
+        // THIS IS THE SCORE COMING IN
         const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
         const rankedScoreArr = [];
 
         for (let i = 0; i < scoreArr.length; i += 2) {
           rankedScoreArr.push([scoreArr[i], scoreArr[i+1]]);
         }
-
         this.setState({ rankedScoreArr })
       }
+
     };
   }
 
   render() {
-    const { question, user } = this.props;
-    const { startedBySocket } = this.state;
+    const { question } = this.props;
+    let { startedBySocket } = this.state;
 
     if (!question) {
       return (<div>loading...</div>);
     } else {
+      const votingRoundEndTime = this.state.votingRoundEndTime || question.voting_round_end_time;
+      let secondsLeft = '';
+
+      if (votingRoundEndTime) {
+        secondsLeft = Math.floor((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
+      }
+
       const startTime = new Date(question.start_time);
       const questionIsActive = startedBySocket || Date.now() >= startTime;
 
       return (
-        <div className="">
+        <div>
+          <div>{secondsLeft > 0 ? secondsLeft : question.end_time ? 'Voting done': 'Loading next round...'}</div>
+          <br/>
           <p>
             {question.question_text}
           </p>
 
-          { questionIsActive ? this.renderVoting() : this.renderTooEarly() }
+          <br/>
+          <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+          <div>{question.answer}</div>
+          <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+
+          { questionIsActive ? this.renderVoting(secondsLeft) : this.renderTooEarly() }
 
         </div>
       );
     }
   }
 
-  renderVoting() {
-    const { answer } = this.props.question;
+  renderVoting(secondsLeft) {
+    const { question } = this.props;
     return (
       <div>
+        <div>use {`<END_SENTENCE>`} to vote for answer being finished</div>
+        <br/>
         <div>
           name: <input
             onChange={e => this.setState({ name: e.target.value })}
@@ -101,15 +139,14 @@ class QuestionPage extends Component {
             onChange={e => this.setState({ text: e.target.value })}
           />
         </div>
-        <button onClick={this.submitVote}>
+        <button onClick={this.submitVote} disabled={secondsLeft <= 0}>
           submit
         </button>
+        <br/>
+        <br/>
 
-        <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
-        <div>{answer}</div>
-        <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+        {!question.end_time && this.renderScores()}
 
-        { this.renderScores() }
       </div>
     );
   }
@@ -138,6 +175,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   fetchQuestion,
+  setNextVotingRound,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuestionPage);

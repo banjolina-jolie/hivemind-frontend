@@ -10,6 +10,7 @@ export const CREATE_USER_SUCCESS = 'create-user/LOAD_SUCCESS';
 export const CREATE_USER_FAIL = 'create-user/LOAD_FAIL';
 
 export const SET_QUESTION = 'question/set-question';
+export const SET_NEXT_VOTING_ROUND = 'question/set-next-voting-round';
 
 const initialState = {
   user: {name: 'Dylan'},
@@ -25,6 +26,15 @@ export default function reducer(state = initialState, action) {
         ...state,
         question: action.payload,
       };
+
+    case SET_NEXT_VOTING_ROUND:
+      return {
+        ...state,
+        question: {
+          ...state.question,
+          answer: `${state.question.answer} ${action.payload.winningWord}`
+        }
+      }
 
     case CREATE_USER:
       return { ...state, user: action.payload.data };
@@ -58,4 +68,13 @@ export function fetchQuestion(questionId) {
       }
     });
   };
+}
+
+export function setNextVotingRound(winningWord) {
+  return {
+    type: SET_NEXT_VOTING_ROUND,
+    payload: {
+      winningWord,
+    },
+  }
 }
