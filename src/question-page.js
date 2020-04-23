@@ -18,7 +18,6 @@ class QuestionPage extends Component {
   state = {
     text: '',
     name: '',
-    startedBySocket: false,
     rankedScoreArr: null,
     votingRoundEndTime: null,
   };
@@ -59,7 +58,7 @@ class QuestionPage extends Component {
         const obj = JSON.parse(data.slice(0, data.indexOf('}') + 1)); // cut off weird byte strings at end :/
         const { votingRoundEndTime } = obj;
         if (obj.start) {
-          this.setState({ startedBySocket: true,  votingRoundEndTime });
+          this.setState({ votingRoundEndTime });
         } else if (obj.winningWord) {
           if (obj.winningWord === '<END_SENTENCE>') {
             console.log('end of voting')
@@ -68,7 +67,7 @@ class QuestionPage extends Component {
             console.log('setting next round')
             console.log('setting next round')
             setNextVotingRound(obj.winningWord);
-            this.setState({ startedBySocket: true,  votingRoundEndTime });
+            this.setState({ votingRoundEndTime });
           }
           this.setState({ rankedScoreArr: null });
         }
@@ -88,7 +87,6 @@ class QuestionPage extends Component {
 
   render() {
     const { question } = this.props;
-    let { startedBySocket } = this.state;
 
     if (!question) {
       return (<div>loading...</div>);
@@ -101,7 +99,7 @@ class QuestionPage extends Component {
       }
 
       const startTime = new Date(question.start_time);
-      const questionIsActive = startedBySocket || Date.now() >= startTime;
+      const questionIsActive = Date.now() >= startTime;
 
       return (
         <div>
@@ -115,6 +113,7 @@ class QuestionPage extends Component {
           <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
           <div>{question.answer}</div>
           <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+          <br/>
 
           { questionIsActive ? this.renderVoting(secondsLeft) : this.renderTooEarly() }
 
@@ -125,6 +124,11 @@ class QuestionPage extends Component {
 
   renderVoting(secondsLeft) {
     const { question } = this.props;
+
+    if (question.end_time) {
+      return null;
+    }
+
     return (
       <div>
         <div>use {`<END_SENTENCE>`} to vote for answer being finished</div>

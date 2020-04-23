@@ -27,14 +27,21 @@ export default function reducer(state = initialState, action) {
         question: action.payload,
       };
 
-    case SET_NEXT_VOTING_ROUND:
+    case SET_NEXT_VOTING_ROUND: {
+      let answer = `${action.payload.winningWord}`;
+
+      if (state.question.answer) {
+        answer = `${state.question.answer} ${answer}`
+      }
+
       return {
         ...state,
         question: {
           ...state.question,
-          answer: `${state.question.answer} ${action.payload.winningWord}`
+          answer,
         }
-      }
+      };
+    }
 
     case CREATE_USER:
       return { ...state, user: action.payload.data };
