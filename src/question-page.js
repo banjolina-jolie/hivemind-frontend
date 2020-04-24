@@ -48,7 +48,8 @@ class QuestionPage extends Component {
 
     fetchQuestion(questionId);
 
-    this.ws = new ReconnectingWebSocket(`ws://127.0.0.1:9001?question=${questionId}&user=${user.id}`);
+    // this.ws = new ReconnectingWebSocket(`ws://127.0.0.1:9001?question=${questionId}&user=${user.id}`);
+    this.ws = new ReconnectingWebSocket(`wss://hivemind-ws.herokuapp.com?question=${questionId}&user=${user.id}`);
 
     this.ws.onmessage = ({ data }) => {
       // Maybe combine startitbro and votenextwordbro to just update question
