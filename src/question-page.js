@@ -5,6 +5,9 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { fetchQuestion, setNextVotingRound } from './reducer';
 
+// const wsUrl = 'ws://127.0.0.1:9001';
+const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+
 // function NavButton() {
 //   const history = useHistory();
 //   return (
@@ -48,11 +51,9 @@ class QuestionPage extends Component {
 
     fetchQuestion(questionId);
 
-    // this.ws = new ReconnectingWebSocket(`ws://127.0.0.1:9001?question=${questionId}&user=${user.id}`);
-    this.ws = new ReconnectingWebSocket(`wss://hivemind-ws.herokuapp.com?question=${questionId}&user=${user.id}`);
+    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${questionId}`);
 
     this.ws.onmessage = ({ data }) => {
-      // Maybe combine startitbro and votenextwordbro to just update question
       const isObject = data.indexOf('}') !== -1;
 
       if (isObject) {
@@ -64,8 +65,6 @@ class QuestionPage extends Component {
           if (obj.winningWord === '<END_SENTENCE>') {
             console.log('end of voting')
           } else {
-            console.log('setting next round')
-            console.log('setting next round')
             console.log('setting next round')
             setNextVotingRound(obj.winningWord);
             this.setState({ votingRoundEndTime });
@@ -92,7 +91,7 @@ class QuestionPage extends Component {
     if (!question) {
       return (<div>loading...</div>);
     } else {
-      const votingRoundEndTime = this.state.votingRoundEndTime || question.voting_round_end_time;
+      const votingRoundEndTime = this.state.votingRoundEndTime && (Number(this.state.votingRoundEndTime)) || question.voting_round_end_time;
       let secondsLeft = '';
 
       if (votingRoundEndTime) {

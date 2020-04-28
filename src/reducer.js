@@ -30,7 +30,7 @@ export default function reducer(state = initialState, action) {
     case SET_NEXT_VOTING_ROUND: {
       let answer = `${action.payload.winningWord}`;
 
-      if (state.question.answer) {
+      if (state.question && state.question.answer) {
         answer = `${state.question.answer} ${answer}`
       }
 
