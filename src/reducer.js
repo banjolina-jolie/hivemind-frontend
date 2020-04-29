@@ -28,18 +28,21 @@ export default function reducer(state = initialState, action) {
       };
 
     case SET_NEXT_VOTING_ROUND: {
-      let answer = `${action.payload.winningWord}`;
+      let winningWord = `${action.payload.winningWord}`;
+
+      const question = { ...state.question };
 
       if (state.question && state.question.answer) {
-        answer = `${state.question.answer} ${answer}`
+        if (winningWord === '(complete-answer)') {
+          question.end_time = true;
+        } else if (winningWord) {
+          question.answer = `${question.answer} ${winningWord}`
+        }
       }
 
       return {
         ...state,
-        question: {
-          ...state.question,
-          answer,
-        }
+        question,
       };
     }
 

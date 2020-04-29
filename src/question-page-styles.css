@@ -1,0 +1,14 @@
+.word-scores {
+  display: inline-block;
+  vertical-align: top;
+  font-size: 18px;
+}
+
+.scored-word {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.scored-word:hover {
+  color: #333;
+}

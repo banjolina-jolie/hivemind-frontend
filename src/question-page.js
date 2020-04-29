@@ -5,6 +5,8 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { fetchQuestion, setNextVotingRound } from './reducer';
 
+import './question-page-styles.css';
+
 const wsUrl = 'ws://localhost:9001';
 // const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 
@@ -19,37 +21,32 @@ const wsUrl = 'ws://localhost:9001';
 
 class QuestionPage extends Component {
   state = {
-    text: '',
     name: '',
     rankedScoreArr: null,
+    text: '',
     votingRoundEndTime: null,
   };
 
-  submitVote = () => {
-    const { question } = this.props;
-    const { name, text } = this.state;
-    const str = `${name} ${text} ${question.id.toString()}`;
-    this.ws.send(str);
+  submitTypedVote = () => {
+    this.submitVote(this.state.text);
   };
 
-  componentWillUnmount() {
-    clearInterval(this.refreshTimer);
-  }
+  submitVote = text => {
+    const { question } = this.props;
+    const { name } = this.state;
 
-  componentDidMount() {
-    clearInterval(this.refreshTimer);
-    this.refreshTimer = setInterval(() => {
-      this.forceUpdate();
-    }, 1000);
+    if (!name || !this.ws) { return }
+
+    const str = `${name} ${text} ${question.id.toString()}`;
+    this.ws.send(str);
+    this.setState({ text });
+  };
+
+  connectToWebsocket = () => {
     const {
-      fetchQuestion,
       setNextVotingRound,
-        match: { params: { questionId } },
-        // question,
-        user,
-      } = this.props;
-
-    fetchQuestion(questionId);
+      match: { params: { questionId } },
+    } = this.props;
 
     this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${questionId}`);
 
@@ -63,13 +60,13 @@ class QuestionPage extends Component {
         if (obj.start) {
           this.setState({ votingRoundEndTime });
         } else if (typeof obj.winningWord === 'string') {
-          if (obj.winningWord === '<END_SENTENCE>') {
+          if (obj.winningWord === '(complete-answer)') {
             console.log('end of voting')
           } else {
             console.log('setting next round')
-            setNextVotingRound(obj.winningWord);
-            this.setState({ votingRoundEndTime });
           }
+          setNextVotingRound(obj.winningWord);
+          this.setState({ votingRoundEndTime, text: '' });
           this.setState({ rankedScoreArr: null });
         }
       } else if (data.indexOf(']') !== -1) {
@@ -82,9 +79,32 @@ class QuestionPage extends Component {
         }
         this.setState({ rankedScoreArr })
       }
-
     };
+  };
+
+  componentWillUnmount() {
+    clearInterval(this.refreshTimer);
   }
+
+  componentDidMount() {
+    clearInterval(this.refreshTimer);
+
+    this.refreshTimer = setInterval(() => {
+      this.forceUpdate();
+    }, 1000);
+
+    const {
+      fetchQuestion,
+      match: { params: { questionId } },
+      question,
+    } = this.props;
+
+    fetchQuestion(questionId);
+
+    // if (question && !question.end_time) {
+      this.connectToWebsocket();
+    // }
+  };
 
   render() {
     const { question } = this.props;
@@ -92,11 +112,11 @@ class QuestionPage extends Component {
     if (!question) {
       return (<div>loading...</div>);
     } else {
-      const votingRoundEndTime = this.state.votingRoundEndTime && (Number(this.state.votingRoundEndTime)) || question.voting_round_end_time;
+      const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.voting_round_end_time;
       let secondsLeft = '';
 
       if (votingRoundEndTime) {
-        secondsLeft = Math.floor((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
+        secondsLeft = Math.ceil((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
       }
 
       const startTime = new Date(question.start_time);
@@ -104,21 +124,31 @@ class QuestionPage extends Component {
 
       return (
         <div>
-          <div>
-            your name: <input
-              onChange={e => this.setState({ name: e.target.value })}
-            />
-          </div>
+          {
+            !question.end_time && (
+              <div>
+                your name: <input
+                  onChange={e => this.setState({ name: e.target.value })}
+                />
+              </div>
+            )
+          }
           <br/>
           { !questionIsActive && this.renderTooEarly() }
-          <div>{secondsLeft > 0 ? secondsLeft : question.end_time ? 'Voting done': 'Loading next round...'}</div>
+          <div>{question.end_time ? 'Voting done' : secondsLeft > 0 ? secondsLeft : 'Loading next round...'}</div>
           <br/>
           <p>
             <b>Q:</b> {question.question_text}
           </p>
 
           <br/>
-          <div><b>A:</b> {question.answer}</div>
+          <div>
+            <b>A:</b> {question.answer} {!question.end_time && (
+              <div className="word-scores">
+                { this.renderScores() }
+              </div>
+            )}
+          </div>
           <br/>
 
           { questionIsActive && this.renderVoting(secondsLeft) }
@@ -137,21 +167,21 @@ class QuestionPage extends Component {
 
     return (
       <div>
-        <div>use {`<END_SENTENCE>`} to vote for answer being finished</div>
-        <br/>
-
         <div>
-          text: <input
+          your vote: <input
             onChange={e => this.setState({ text: e.target.value })}
+            value={this.state.text}
           />
         </div>
-        <button onClick={this.submitVote} disabled={secondsLeft <= 0}>
+        <button onClick={() => this.submitTypedVote()} disabled={secondsLeft <= 0}>
           submit
         </button>
         <br/>
+        <button onClick={() => this.submitVote('(complete-answer)')} disabled={secondsLeft <= 0}>
+          Vote to complete answer ✓
+        </button>
         <br/>
-
-        {!question.end_time && this.renderScores()}
+        <br/>
 
       </div>
     );
@@ -163,8 +193,15 @@ class QuestionPage extends Component {
 
   renderScores() {
     const { rankedScoreArr } = this.state;
-    return rankedScoreArr && rankedScoreArr.map(([a, b], idx) => (
-      <div key={idx}>{a}: {b}</div>
+    return rankedScoreArr && rankedScoreArr.map(([word, score], idx) => (
+      <div key={idx}>
+        <span
+          className="scored-word"
+          onClick={() => this.submitVote(word)}
+        >
+          {word === '(complete-answer)' ? '✅' : word}
+        </span>: {score}
+      </div>
     ));
   }
 
