@@ -5,8 +5,8 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { fetchQuestion, setNextVotingRound } from './reducer';
 
-// const wsUrl = 'ws://127.0.0.1:9001';
-const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+const wsUrl = 'ws://localhost:9001';
+// const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 
 // function NavButton() {
 //   const history = useHistory();
@@ -54,6 +54,7 @@ class QuestionPage extends Component {
     this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${questionId}`);
 
     this.ws.onmessage = ({ data }) => {
+      console.log(data)
       const isObject = data.indexOf('}') !== -1;
 
       if (isObject) {
@@ -61,7 +62,7 @@ class QuestionPage extends Component {
         const { votingRoundEndTime } = obj;
         if (obj.start) {
           this.setState({ votingRoundEndTime });
-        } else if (obj.winningWord) {
+        } else if (typeof obj.winningWord === 'string') {
           if (obj.winningWord === '<END_SENTENCE>') {
             console.log('end of voting')
           } else {
@@ -103,19 +104,24 @@ class QuestionPage extends Component {
 
       return (
         <div>
+          <div>
+            your name: <input
+              onChange={e => this.setState({ name: e.target.value })}
+            />
+          </div>
+          <br/>
+          { !questionIsActive && this.renderTooEarly() }
           <div>{secondsLeft > 0 ? secondsLeft : question.end_time ? 'Voting done': 'Loading next round...'}</div>
           <br/>
           <p>
-            {question.question_text}
+            <b>Q:</b> {question.question_text}
           </p>
 
           <br/>
-          <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
-          <div>{question.answer}</div>
-          <div>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</div>
+          <div><b>A:</b> {question.answer}</div>
           <br/>
 
-          { questionIsActive ? this.renderVoting(secondsLeft) : this.renderTooEarly() }
+          { questionIsActive && this.renderVoting(secondsLeft) }
 
         </div>
       );
@@ -133,11 +139,7 @@ class QuestionPage extends Component {
       <div>
         <div>use {`<END_SENTENCE>`} to vote for answer being finished</div>
         <br/>
-        <div>
-          name: <input
-            onChange={e => this.setState({ name: e.target.value })}
-          />
-        </div>
+
         <div>
           text: <input
             onChange={e => this.setState({ text: e.target.value })}
@@ -156,7 +158,7 @@ class QuestionPage extends Component {
   }
 
   renderTooEarly() {
-    return (<div>Little early bud</div>);
+    return (<div>Voting starts in:</div>);
   }
 
   renderScores() {

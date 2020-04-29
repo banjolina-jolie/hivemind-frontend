@@ -8,7 +8,7 @@ import reducer from './reducer';
 
 import './index.css';
 
-import App from './App';
+// import App from './App';
 import QuestionPage from './question-page';
 
 const middlewares = [
@@ -22,7 +22,7 @@ ReactDOM.render(
     <Router>
       <Switch>
         <Route path="/question/:questionId" component={QuestionPage}/>
-        <Route path="/" component={App}/>
+        {/*<Route path="/" component={App}/>*/}
       </Switch>
     </Router>
   </Provider>,
