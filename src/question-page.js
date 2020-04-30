@@ -7,8 +7,8 @@ import { fetchQuestion, setNextVotingRound } from './reducer';
 
 import './question-page-styles.css';
 
-const wsUrl = 'ws://localhost:9001';
-// const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+// const wsUrl = 'ws://localhost:9001';
+const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 
 // function NavButton() {
 //   const history = useHistory();
