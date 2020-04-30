@@ -101,7 +101,7 @@ class QuestionPage extends Component {
 
     fetchQuestion(questionId);
 
-    // if (question && !question.end_time) {
+    // if (question && !question.endTime) {
       this.connectToWebsocket();
     // }
   };
@@ -112,20 +112,20 @@ class QuestionPage extends Component {
     if (!question) {
       return (<div>loading...</div>);
     } else {
-      const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.voting_round_end_time;
+      const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.votingRoundEndTime;
       let secondsLeft = '';
 
       if (votingRoundEndTime) {
         secondsLeft = Math.ceil((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
       }
 
-      const startTime = new Date(question.start_time);
+      const startTime = new Date(question.startTime);
       const questionIsActive = Date.now() >= startTime;
 
       return (
         <div>
           {
-            !question.end_time && (
+            !question.endTime && (
               <div>
                 your name: <input
                   onChange={e => this.setState({ name: e.target.value })}
@@ -135,15 +135,15 @@ class QuestionPage extends Component {
           }
           <br/>
           { !questionIsActive && this.renderTooEarly() }
-          <div>{question.end_time ? 'Voting done' : secondsLeft > 0 ? secondsLeft : 'Loading next round...'}</div>
+          <div>{question.endTime ? 'Voting done' : secondsLeft > 0 ? secondsLeft : 'Loading next round...'}</div>
           <br/>
           <p>
-            <b>Q:</b> {question.question_text}
+            <b>Q:</b> {question.questionText}
           </p>
 
           <br/>
           <div>
-            <b>A:</b> {question.answer} {!question.end_time && (
+            <b>A:</b> {question.answer} {!question.endTime && (
               <div className="word-scores">
                 { this.renderScores() }
               </div>
@@ -161,7 +161,7 @@ class QuestionPage extends Component {
   renderVoting(secondsLeft) {
     const { question } = this.props;
 
-    if (question.end_time) {
+    if (question.endTime) {
       return null;
     }
 

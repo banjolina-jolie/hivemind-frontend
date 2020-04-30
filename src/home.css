@@ -1,0 +1,24 @@
+.home-container {
+  margin: 40px;
+}
+.home-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.home-body {
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
+}
+.question-container {
+  margin-top: 40px;
+}
+.left-column {
+  flex: 1;
+  max-width: 300px;
+}
+.right-column {
+  flex: 2;
+  padding: 0 80px;
+}

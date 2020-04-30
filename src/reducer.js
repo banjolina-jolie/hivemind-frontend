@@ -22,6 +22,7 @@ export default function reducer(state = initialState, action) {
 
   switch (action.type) {
     case SET_QUESTION:
+      // console.log(action.payload)
       return {
         ...state,
         question: action.payload,
