@@ -9,6 +9,10 @@ export const axiosClient = axios.create({
   // baseURL: 'https://hivemind-rails.herokuapp.com',
   responseType: 'json',
   transformRequest: [function (data, headers) {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      headers.common["Authorization"] = `Bearer ${authToken}`;
+    }
     snakeCaseizeKeys(data);
     return JSON.stringify(data);
   }],

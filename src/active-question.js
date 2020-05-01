@@ -2,13 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // import { useHistory } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
-
 import { fetchQuestion, setNextVotingRound } from './reducer';
+import './active-question-styles.css';
 
-import './question-page-styles.css';
-
-// const wsUrl = 'ws://localhost:9001';
-const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+const wsUrl = 'ws://localhost:9001';
+// const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 
 // function NavButton() {
 //   const history = useHistory();
@@ -19,9 +17,8 @@ const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 //   );
 // }
 
-class QuestionPage extends Component {
+class ActiveQuestion extends Component {
   state = {
-    name: '',
     rankedScoreArr: null,
     text: '',
     votingRoundEndTime: null,
@@ -32,12 +29,11 @@ class QuestionPage extends Component {
   };
 
   submitVote = text => {
-    const { question } = this.props;
-    const { name } = this.state;
+    const { question, user } = this.props;
 
-    if (!name || !this.ws) { return }
+    if (!this.ws) { return }
 
-    const str = `${name} ${text} ${question.id.toString()}`;
+    const str = `${user.id} ${text} ${question.id.toString()}`;
     this.ws.send(str);
     this.setState({ text });
   };
@@ -45,10 +41,10 @@ class QuestionPage extends Component {
   connectToWebsocket = () => {
     const {
       setNextVotingRound,
-      match: { params: { questionId } },
+      question,
     } = this.props;
 
-    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${questionId}`);
+    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}`);
 
     this.ws.onmessage = ({ data }) => {
       console.log(data)
@@ -95,11 +91,10 @@ class QuestionPage extends Component {
 
     const {
       fetchQuestion,
-      match: { params: { questionId } },
       question,
     } = this.props;
 
-    fetchQuestion(questionId);
+    // fetchQuestion(question.id);
 
     // if (question && !question.endTime) {
       this.connectToWebsocket();
@@ -107,11 +102,11 @@ class QuestionPage extends Component {
   };
 
   render() {
-    const { question } = this.props;
+    const { question, user } = this.props;
 
-    if (!question) {
-      return (<div>loading...</div>);
-    } else {
+    // if (!question) {
+    //   return (<div>loading...</div>);
+    // } else {
       const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.votingRoundEndTime;
       let secondsLeft = '';
 
@@ -124,38 +119,25 @@ class QuestionPage extends Component {
 
       return (
         <div>
-          {
-            !question.endTime && (
-              <div>
-                your name: <input
-                  onChange={e => this.setState({ name: e.target.value })}
-                />
-              </div>
-            )
-          }
+          { !questionIsActive && this.renderTooEarly(secondsLeft) }
+          { questionIsActive && !question.endTime && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
+          { question.endTime && 'Voting done' }
           <br/>
-          { !questionIsActive && this.renderTooEarly() }
-          <div>{question.endTime ? 'Voting done' : secondsLeft > 0 ? secondsLeft : 'Loading next round...'}</div>
-          <br/>
-          <p>
-            <b>Q:</b> {question.questionText}
-          </p>
-
-          <br/>
-          <div>
-            <b>A:</b> {question.answer} {!question.endTime && (
-              <div className="word-scores">
-                { this.renderScores() }
-              </div>
-            )}
-          </div>
+          <div className="label">Question</div>
+          <div className="big-text">{question.questionText}</div>
+          <div className="label">Answer</div>
+          <div className="big-text">{question.answer} {!question.endTime && (
+            <div className="word-scores">
+              { this.renderScores() }
+            </div>
+          )}</div>
           <br/>
 
-          { questionIsActive && this.renderVoting(secondsLeft) }
+          { questionIsActive && user && this.renderVoting(secondsLeft) }
 
         </div>
       );
-    }
+    // }
   }
 
   renderVoting(secondsLeft) {
@@ -187,20 +169,31 @@ class QuestionPage extends Component {
     );
   }
 
-  renderTooEarly() {
-    return (<div>Voting starts in:</div>);
+  renderTooEarly(secondsLeft) {
+    const oneDay = 60 * 60 * 24;
+    if (Number(secondsLeft) < oneDay) {
+      const text = window.moment().hour(0).minute(0).second(Number(secondsLeft)).format('HH:mm:ss');
+      return (<div>Voting starts in: {text}</div>);
+    } else {
+      const text = window.moment(new Date().getTime() + (Number(secondsLeft) * 1000)).calendar();
+      return (<div>Voting starts: {text}</div>);
+    }
   }
 
   renderScores() {
+    const { user } = this.props;
     const { rankedScoreArr } = this.state;
     return rankedScoreArr && rankedScoreArr.map(([word, score], idx) => (
       <div key={idx}>
         <span
           className="scored-word"
-          onClick={() => this.submitVote(word)}
+          onClick={() => user && this.submitVote(word)}
+          style={{
+            cursor: user ? 'pointer' : 'default',
+          }}
         >
           {word === '(complete-answer)' ? '✅' : word}
-        </span>: {score}
+        </span>{/*: {score}*/}
       </div>
     ));
   }
@@ -221,4 +214,4 @@ const mapDispatchToProps = {
   setNextVotingRound,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(QuestionPage);
+export default connect(mapStateToProps, mapDispatchToProps)(ActiveQuestion);

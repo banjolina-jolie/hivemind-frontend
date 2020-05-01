@@ -16,9 +16,18 @@
 }
 .left-column {
   flex: 1;
-  max-width: 300px;
+  max-width: 350px;
 }
 .right-column {
   flex: 2;
   padding: 0 80px;
+}
+
+.big-text {
+  margin: 20px 0;
+}
+
+.label {
+  padding-bottom: 5px;
+  border-bottom: 2px solid #ddd;
 }

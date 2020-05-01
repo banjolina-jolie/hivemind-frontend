@@ -7,9 +7,10 @@ import thunk from 'redux-thunk';
 import reducer from './reducer';
 
 import './index.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Home from './home';
-import QuestionPage from './question-page';
+// import ActiveQuestion from './active-question';
 
 const middlewares = [
   thunk,
@@ -21,7 +22,7 @@ ReactDOM.render(
   <Provider store={store}>
     <Router>
       <Switch>
-        <Route path="/question/:questionId" component={QuestionPage}/>
+        {/*<Route path="/question/:questionId" component={ActiveQuestion}/>*/}
         <Route path="/" component={Home}/>
       </Switch>
     </Router>

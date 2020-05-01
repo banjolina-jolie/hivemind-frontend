@@ -12,9 +12,14 @@ export const CREATE_USER_FAIL = 'create-user/LOAD_FAIL';
 export const SET_QUESTION = 'question/set-question';
 export const SET_NEXT_VOTING_ROUND = 'question/set-next-voting-round';
 
+export const SET_USER = 'user/set-user';
+
+export const SET_HOME_DATA = 'home/set-home-data';
+
 const initialState = {
-  user: {name: 'Dylan'},
+  user: null,
   question: null,
+  homeData: null,
 };
 
 
@@ -28,6 +33,19 @@ export default function reducer(state = initialState, action) {
         question: action.payload,
       };
 
+    case SET_USER:
+      return {
+        ...state,
+        user: action.payload.user,
+      };
+
+    case SET_HOME_DATA:
+      return {
+        ...state,
+        homeData: action.payload,
+        question: action.payload.activeQuestion,
+      };
+
     case SET_NEXT_VOTING_ROUND: {
       let winningWord = `${action.payload.winningWord}`;
 
@@ -35,7 +53,7 @@ export default function reducer(state = initialState, action) {
 
       if (state.question && state.question.answer) {
         if (winningWord === '(complete-answer)') {
-          question.end_time = true;
+          question.endTime = true;
         } else if (winningWord) {
           question.answer = `${question.answer} ${winningWord}`
         }
@@ -88,4 +106,60 @@ export function setNextVotingRound(winningWord) {
       winningWord,
     },
   }
+}
+
+export function logout() {
+  localStorage.removeItem('authToken');
+  delete axiosClient.defaults.headers.common["Authorization"];
+  return {
+    type: SET_USER,
+    payload: {
+      user: null,
+    },
+  };
+}
+
+export function submitLogin(email, password) {
+  return dispatch => {
+    return axiosClient.post(`/auth-user`, { email, password }).then(res => {
+      if (res) {
+        localStorage.setItem('authToken', res.data.authToken);
+        axiosClient.defaults.headers.common["Authorization"] = `Bearer ${res.data.authToken}`;
+        dispatch({
+          type: SET_USER,
+          payload: {
+            user: res.data,
+          },
+        });
+      }
+    });
+  };
+};
+
+export function fetchUser() {
+  return dispatch => {
+    return axiosClient.get('/me').then(res => {
+      if (res) {
+        dispatch({
+          type: SET_USER,
+          payload: {
+            user: res.data,
+          },
+        });
+      }
+    });
+  };
+}
+
+export function fetchHomeData() {
+  return dispatch => {
+    return axiosClient.get('/home').then(res => {
+      if (res) {
+        dispatch({
+          type: SET_HOME_DATA,
+          payload: res.data,
+        });
+      }
+    });
+  };
 }

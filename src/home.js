@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './home.css';
 import { connect } from 'react-redux';
 import {
@@ -8,56 +8,79 @@ import {
   Link
 } from "react-router-dom";
 
-function Home({ user }) {
-  return (
-    <div className="home-container">
-      <div className="home-header">
-        <b>Hivemind</b>
-        <div>The hive is live with  10,000 minds</div>
-        <Link to="/foo">Foo</Link>
-      </div>
-      <div className="home-body">
-        <div className="left-column">
-          <div>Today's Questions</div>
-          _________________________
+import LoggedInOverlay from './components/logged-in-overlay';
+import LoginOverlay from './components/login-overlay';
 
-          <div className="question-container">
-            <div><b>Is there other life on the universe?</b></div>
-            <div>There probably is</div>
-          </div>
-          <div className="question-container">
-            <div><b>If we ever meet aliens, what will be the first thing they say to us?</b></div>
-            <div>Stop destroying your planet and yourselves.</div>
-          </div>
+import ActiveQuestion from './active-question';
 
+import { fetchUser, logout, fetchHomeData } from './reducer';
+
+class Home extends Component {
+
+  componentDidMount() {
+    if (!this.props.user && localStorage.getItem('authToken')) {
+      this.props.fetchUser();
+    }
+
+    if (!this.props.homeData) {
+      this.props.fetchHomeData();
+    }
+  }
+
+  render() {
+    const { user, logout, homeData, question } = this.props;
+    if (!homeData) { return (<div>loading</div>) }
+
+    return (
+      <div className="home-container">
+        <div className="home-header">
+          <b>Hivemind</b>
+          <div>The hive is live with  10,000 minds</div>
+          {user ? <LoggedInOverlay /> : <LoginOverlay /> }
+
+          {/*<Link to="/foo">Foo</Link>*/}
         </div>
-        <div className="right-column">
-          <div>Question</div>
-          _________________________
+        <div className="home-body">
+          <div className="left-column">
+            <div className="label">Past Questions</div>
+            {
+              (homeData.previousQuestions || []).map((question, idx) => (
+                <div key={`prev-question-${idx}`} className="question-container">
+                  <div><b>{question.questionText}</b></div>
+                  <div>{question.answer}</div>
+                </div>
+              ))
+            }
+          </div>
+          <div className="right-column">
+            {/*<div className="label">Question</div>
+            <h1 className="big-text">{homeData.activeQuestion.questionText}</h1>
+            <div className="label">Answer</div>
+            <h1 className="big-text">{homeData.activeQuestion.answer}</h1>*/}
 
-          <h1>What is the meaning of life?</h1>
-
-          <div>Answer</div>
-          _________________________
-
-          <h1>To love</h1>
-
-
+            { !!question && <ActiveQuestion/> }
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
 }
 
 const mapStateToProps = state => {
-  const { user } = state;
+  const { user, question, homeData } = state;
 
   return {
+    homeData,
+    question,
     user,
   };
 };
 
 const mapDispatchToProps = {
+  fetchHomeData,
+  fetchUser,
+  logout,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

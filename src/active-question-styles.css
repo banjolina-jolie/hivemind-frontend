@@ -1,0 +1,25 @@
+.word-scores {
+  display: inline-block;
+  vertical-align: top;
+  /*font-size: 2.5rem;*/
+}
+
+.scored-word {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/*.scored-word:hover {
+  color: #444;
+}*/
+
+.big-text {
+  font-size: 2.5rem;
+  margin: 20px 0;
+  /*font-weight: bold;*/
+}
+
+.label {
+  padding-bottom: 5px;
+  border-bottom: 2px solid #ddd;
+}
