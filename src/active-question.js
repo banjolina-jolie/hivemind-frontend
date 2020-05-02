@@ -5,8 +5,8 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { fetchQuestion, setNextVotingRound } from './reducer';
 import './active-question-styles.css';
 
-const wsUrl = 'ws://localhost:9001';
-// const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+// const wsUrl = 'ws://localhost:9001';
+const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 
 // function NavButton() {
 //   const history = useHistory();
@@ -33,7 +33,7 @@ class ActiveQuestion extends Component {
 
     if (!this.ws) { return }
 
-    const str = `${user.id} ${text} ${question.id.toString()}`;
+    const str = `${user.id} ${text} ${question.id}`;
     this.ws.send(str);
     this.setState({ text });
   };
@@ -42,31 +42,37 @@ class ActiveQuestion extends Component {
     const {
       setNextVotingRound,
       question,
+      user,
     } = this.props;
 
+    // this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}user=${user && user.id}`);
     this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}`);
 
     this.ws.onmessage = ({ data }) => {
-      console.log(data)
       const isObject = data.indexOf('}') !== -1;
 
       if (isObject) {
         const obj = JSON.parse(data.slice(0, data.indexOf('}') + 1)); // cut off weird byte strings at end :/
         const { votingRoundEndTime } = obj;
         if (obj.start) {
+          // START MESSAGE
           this.setState({ votingRoundEndTime });
         } else if (typeof obj.winningWord === 'string') {
+          // END OF VOTING ROUND MESSAGE
           if (obj.winningWord === '(complete-answer)') {
             console.log('end of voting')
           } else {
             console.log('setting next round')
           }
           setNextVotingRound(obj.winningWord);
-          this.setState({ votingRoundEndTime, text: '' });
-          this.setState({ rankedScoreArr: null });
+          this.setState({
+            votingRoundEndTime,
+            text: '',
+            rankedScoreArr: null
+          });
         }
       } else if (data.indexOf(']') !== -1) {
-        // THIS IS THE SCORE COMING IN
+        // SCORE COMING IN MESSAGE
         const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
         const rankedScoreArr = [];
 
@@ -89,17 +95,23 @@ class ActiveQuestion extends Component {
       this.forceUpdate();
     }, 1000);
 
-    const {
-      fetchQuestion,
-      question,
-    } = this.props;
+    // const {
+    //   // fetchQuestion,
+    //   // question,
+    // } = this.props;
 
     // fetchQuestion(question.id);
+    this.connectToWebsocket();
 
     // if (question && !question.endTime) {
-      this.connectToWebsocket();
     // }
-  };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (!prevProps.user && this.props.user) {
+      // this.connectToWebsocket();
+    }
+  }
 
   render() {
     const { question, user } = this.props;

@@ -1,5 +1,5 @@
 import { axiosClient } from './axios';
-
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export const AUTHENTICATE_USER = 'auth-user/LOAD';
 export const AUTHENTICATE_USER_SUCCESS = 'auth-user/LOAD_SUCCESS';
@@ -14,12 +14,15 @@ export const SET_NEXT_VOTING_ROUND = 'question/set-next-voting-round';
 
 export const SET_USER = 'user/set-user';
 
+export const SET_WEBSOCKET = 'websocket/set-websocket';
+
 export const SET_HOME_DATA = 'home/set-home-data';
 
 const initialState = {
   user: null,
   question: null,
   homeData: null,
+  // ws: null,
 };
 
 
@@ -37,6 +40,12 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         user: action.payload.user,
+      };
+
+    case SET_WEBSOCKET:
+      return {
+        ...state,
+        ws: action.payload,
       };
 
     case SET_HOME_DATA:
@@ -163,3 +172,15 @@ export function fetchHomeData() {
     });
   };
 }
+
+// export function connectToWs() {
+//   return dispatch => {
+//     const ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}`);
+//     return {
+//       dispatch({
+//         type: SET_WEBSOCKET,
+//         payload: ws,
+//       });
+//     }
+//   };
+// }
