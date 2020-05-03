@@ -60,11 +60,11 @@ export default function reducer(state = initialState, action) {
 
       const question = { ...state.question };
 
-      if (state.question && state.question.answer) {
+      if (question) {
         if (winningWord === '(complete-answer)') {
           question.endTime = true;
         } else if (winningWord) {
-          question.answer = `${question.answer} ${winningWord}`
+          question.answer = `${question.answer} ${winningWord}`.trim();
         }
       }
 

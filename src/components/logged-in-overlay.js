@@ -10,8 +10,6 @@ import '../styles/login-overlay.css';
 
 function LoggedInOverlay({ logout, user }) {
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState('b@b.com');
-  const [password, setPassword] = useState('123123');
 
   const target = useRef(null);
 

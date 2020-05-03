@@ -5,8 +5,8 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 import { fetchQuestion, setNextVotingRound } from './reducer';
 import './active-question-styles.css';
 
-// const wsUrl = 'ws://localhost:9001';
-const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+const wsUrl = 'ws://localhost:9001';
+// const wsUrl = 'ws://hivemind-ws.herokuapp.com';
 
 // function NavButton() {
 //   const history = useHistory();
@@ -42,7 +42,7 @@ class ActiveQuestion extends Component {
     const {
       setNextVotingRound,
       question,
-      user,
+      // user,
     } = this.props;
 
     // this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}user=${user && user.id}`);
@@ -138,11 +138,14 @@ class ActiveQuestion extends Component {
           <div className="label">Question</div>
           <div className="big-text">{question.questionText}</div>
           <div className="label">Answer</div>
-          <div className="big-text">{question.answer} {!question.endTime && (
-            <div className="word-scores">
-              { this.renderScores() }
-            </div>
-          )}</div>
+          <div className="big-text">
+            {question.answer}{ !question.endTime && (
+              <div className="word-scores">
+                <span className="winning-word-underline"></span>
+                { this.renderScores() }
+              </div>
+            )}
+          </div>
           <br/>
 
           { questionIsActive && user && this.renderVoting(secondsLeft) }
@@ -161,22 +164,16 @@ class ActiveQuestion extends Component {
 
     return (
       <div>
-        <div>
-          your vote: <input
-            onChange={e => this.setState({ text: e.target.value })}
-            value={this.state.text}
-          />
-        </div>
+        your vote: <input
+          onChange={e => this.setState({ text: e.target.value })}
+          value={this.state.text}
+        />
         <button onClick={() => this.submitTypedVote()} disabled={secondsLeft <= 0}>
           submit
         </button>
-        <br/>
         <button onClick={() => this.submitVote('(complete-answer)')} disabled={secondsLeft <= 0}>
-          Vote to complete answer ✓
+          Vote complete ✓
         </button>
-        <br/>
-        <br/>
-
       </div>
     );
   }
@@ -195,19 +192,33 @@ class ActiveQuestion extends Component {
   renderScores() {
     const { user } = this.props;
     const { rankedScoreArr } = this.state;
-    return rankedScoreArr && rankedScoreArr.map(([word, score], idx) => (
-      <div key={idx}>
-        <span
-          className="scored-word"
-          onClick={() => user && this.submitVote(word)}
-          style={{
-            cursor: user ? 'pointer' : 'default',
-          }}
-        >
-          {word === '(complete-answer)' ? '✅' : word}
-        </span>{/*: {score}*/}
-      </div>
-    ));
+    // const rankedScoreArr = [['apple', '100'], ['banana', '95'], ['kiwi', '90'], ['grape', '80'], ['cherry', '70'], ['orange', '60'], ['mango', '50'], ['raspberry', '40'], ['pear', '30'], ['guava', '20'], ['pineapple', '10']];
+    if (!rankedScoreArr || !rankedScoreArr.length) return null;
+
+    let topScore = Number(rankedScoreArr[0][1]);
+
+    return rankedScoreArr && rankedScoreArr.map(([word, score], idx) => {
+      let opacity = 0.8 * (Number(score) / topScore);
+
+      if (opacity < 0.10) { opacity = 0.10; }
+
+      return (
+        <div key={idx}>
+          <span
+            className="scored-word"
+            onClick={() => user && this.submitVote(word)}
+            style={{
+              cursor: user ? 'pointer' : 'default',
+              color: `rgba(0, 0, 0, ${opacity}`,
+              // textDecoration: idx === 0 ? 'underline' : null,
+            }}
+          >
+            {word === '(complete-answer)' && idx === 0 ? '' : (<span>&nbsp;</span>)}
+            {word === '(complete-answer)' ? '.' : word}
+          </span>
+        </div>
+      );
+    });
   }
 
 }
