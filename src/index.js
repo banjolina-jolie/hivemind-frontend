@@ -10,7 +10,7 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Home from './home';
-// import ActiveQuestion from './active-question';
+import EditQuestion from './components/edit-question';
 
 const middlewares = [
   thunk,
@@ -22,7 +22,7 @@ ReactDOM.render(
   <Provider store={store}>
     <Router>
       <Switch>
-        {/*<Route path="/question/:questionId" component={ActiveQuestion}/>*/}
+        <Route path="/question/:questionId" component={EditQuestion}/>
         <Route path="/" component={Home}/>
       </Switch>
     </Router>

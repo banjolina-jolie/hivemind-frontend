@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // import { useHistory } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { fetchQuestion, setNextVotingRound } from './reducer';
+import { fetchQuestion, setActiveHiveCount, setNextVotingRound } from './reducer';
 import './active-question-styles.css';
 
 const wsUrl = 'ws://localhost:9001';
@@ -40,13 +40,13 @@ class ActiveQuestion extends Component {
 
   connectToWebsocket = () => {
     const {
+      setActiveHiveCount,
       setNextVotingRound,
       question,
-      // user,
+      user,
     } = this.props;
 
-    // this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}user=${user && user.id}`);
-    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}`);
+    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}&user=${user && user.id}`);
 
     this.ws.onmessage = ({ data }) => {
       const isObject = data.indexOf('}') !== -1;
@@ -70,16 +70,20 @@ class ActiveQuestion extends Component {
             text: '',
             rankedScoreArr: null
           });
-        }
-      } else if (data.indexOf(']') !== -1) {
-        // SCORE COMING IN MESSAGE
-        const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
-        const rankedScoreArr = [];
+        } else if (obj.scores) {
+          // SCORE COMING IN MESSAGE
+          const rankedScoreArr = [];
 
-        for (let i = 0; i < scoreArr.length; i += 2) {
-          rankedScoreArr.push([scoreArr[i], scoreArr[i+1]]);
+          for (let i = 0; i < obj.scores.length; i += 2) {
+            rankedScoreArr.push([obj.scores[i], obj.scores[i+1]]);
+          }
+
+          setActiveHiveCount(obj.activeHiveCount);
+          this.setState({ rankedScoreArr });
+
         }
-        this.setState({ rankedScoreArr })
+      // } else if (data.indexOf(']') !== -1) {
+      //   const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
       }
     };
   };
@@ -127,12 +131,12 @@ class ActiveQuestion extends Component {
       }
 
       const startTime = new Date(question.startTime);
-      const questionIsActive = Date.now() >= startTime;
+      const questionIsActive = Date.now() >= startTime && !question.endTime;
 
       return (
         <div>
           { !questionIsActive && this.renderTooEarly(secondsLeft) }
-          { questionIsActive && !question.endTime && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
+          { questionIsActive && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
           { question.endTime && 'Voting done' }
           <br/>
           <div className="label">Question</div>
@@ -141,7 +145,7 @@ class ActiveQuestion extends Component {
           <div className="big-text">
             {question.answer}{ !question.endTime && (
               <div className="word-scores">
-                <span className="winning-word-underline"></span>
+                { questionIsActive && <span className="winning-word-underline"></span> }
                 { this.renderScores() }
               </div>
             )}
@@ -165,8 +169,11 @@ class ActiveQuestion extends Component {
     return (
       <div>
         your vote: <input
-          onChange={e => this.setState({ text: e.target.value })}
+          onChange={e => this.setState({
+            text: e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase(),
+          })}
           value={this.state.text}
+          maxLength={35}
         />
         <button onClick={() => this.submitTypedVote()} disabled={secondsLeft <= 0}>
           submit
@@ -235,6 +242,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   fetchQuestion,
   setNextVotingRound,
+  setActiveHiveCount,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ActiveQuestion);

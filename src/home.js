@@ -28,27 +28,27 @@ class Home extends Component {
   }
 
   render() {
-    const { user, logout, homeData, question } = this.props;
+    const { user, logout, homeData, question, activeHiveCount } = this.props;
     if (!homeData) { return (<div>loading</div>) }
 
     return (
       <div className="home-container">
         <div className="home-header">
           <b>Hivemind</b>
-          <div>The hive is live with  10,000 minds</div>
+          <div>The hive is live with  {activeHiveCount.toLocaleString()} minds</div>
           {user ? <LoggedInOverlay /> : <LoginOverlay /> }
-
-          {/*<Link to="/foo">Foo</Link>*/}
         </div>
         <div className="home-body">
           <div className="left-column">
             <div className="label">Past Questions</div>
             {
               (homeData.previousQuestions || []).map((question, idx) => (
-                <div key={`prev-question-${idx}`} className="question-container">
-                  <div><b>{question.questionText}</b></div>
-                  <div>{question.answer}</div>
-                </div>
+                <Link to={`/question/${question.id}`} key={`prev-question-${idx}`}>
+                  <div className="question-container">
+                    <div><b>{question.questionText}</b></div>
+                    <div>{question.answer}</div>
+                  </div>
+                </Link>
               ))
             }
           </div>
@@ -68,9 +68,10 @@ class Home extends Component {
 }
 
 const mapStateToProps = state => {
-  const { user, question, homeData } = state;
+  const { activeHiveCount, user, question, homeData } = state;
 
   return {
+    activeHiveCount,
     homeData,
     question,
     user,
