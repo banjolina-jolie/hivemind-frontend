@@ -99,16 +99,7 @@ class ActiveQuestion extends Component {
       this.forceUpdate();
     }, 1000);
 
-    // const {
-    //   // fetchQuestion,
-    //   // question,
-    // } = this.props;
-
-    // fetchQuestion(question.id);
     this.connectToWebsocket();
-
-    // if (question && !question.endTime) {
-    // }
   }
 
   componentDidUpdate(prevProps) {
@@ -119,44 +110,42 @@ class ActiveQuestion extends Component {
 
   render() {
     const { question, user } = this.props;
+    const { rankedScoreArr } = this.state;
 
-    // if (!question) {
-    //   return (<div>loading...</div>);
-    // } else {
-      const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.votingRoundEndTime;
-      let secondsLeft = '';
+    const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.votingRoundEndTime;
+    let secondsLeft = '';
 
-      if (votingRoundEndTime) {
-        secondsLeft = Math.ceil((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
-      }
+    if (votingRoundEndTime) {
+      secondsLeft = Math.ceil((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
+    }
 
-      const startTime = new Date(question.startTime);
-      const questionIsActive = Date.now() >= startTime && !question.endTime;
+    const startTime = new Date(question.startTime);
+    const questionIsActive = Date.now() >= startTime;
+    const winningWord = rankedScoreArr && rankedScoreArr[0] && rankedScoreArr[0][0];
 
-      return (
-        <div>
-          { !questionIsActive && this.renderTooEarly(secondsLeft) }
-          { questionIsActive && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
-          { question.endTime && 'Voting done' }
-          <br/>
-          <div className="label">Question</div>
-          <div className="big-text">{question.questionText}</div>
-          <div className="label">Answer</div>
-          <div className="big-text">
-            {question.answer}{ !question.endTime && (
-              <div className="word-scores">
-                { questionIsActive && <span className="winning-word-underline"></span> }
-                { this.renderScores() }
-              </div>
-            )}
-          </div>
-          <br/>
-
-          { questionIsActive && user && this.renderVoting(secondsLeft) }
-
+    return (
+      <div>
+        { !question.endTime && !questionIsActive && this.renderTooEarly(secondsLeft) }
+        { !question.endTime && questionIsActive && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
+        { question.endTime && 'Voting done' }
+        <br/>
+        <div className="label">Question</div>
+        <div className="big-text">{question.questionText}</div>
+        <div className="label">Answer</div>
+        <div className="big-text">
+          {question.answer}{ !question.endTime && (
+            <div className="word-scores">
+              { questionIsActive && winningWord !== '(complete-answer)' && <span className="winning-word-underline"></span> }
+              { this.renderScores() }
+            </div>
+          )}
         </div>
-      );
-    // }
+        <br/>
+
+        { questionIsActive && user && this.renderVoting(secondsLeft) }
+
+      </div>
+    );
   }
 
   renderVoting(secondsLeft) {

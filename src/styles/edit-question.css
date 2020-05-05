@@ -1,3 +1,13 @@
-div {
-  background-color: 'blue';
+.react-datetime-picker.form-control {
+  display: inline-block;
+  width: auto;
+}
+
+.form-control .react-datetime-picker__wrapper {
+  flex-grow: unset;
+  border: none;
+}
+
+.form-control .react-datetime-picker__inputGroup {
+  flex-grow: unset;
 }
