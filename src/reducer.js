@@ -9,7 +9,7 @@ export const CREATE_USER = 'create-user/LOAD';
 export const CREATE_USER_SUCCESS = 'create-user/LOAD_SUCCESS';
 export const CREATE_USER_FAIL = 'create-user/LOAD_FAIL';
 
-export const SET_QUESTION = 'question/set-question';
+export const SET_EDIT_QUESTION = 'question/set-edit-question';
 export const SET_NEXT_VOTING_ROUND = 'question/set-next-voting-round';
 export const SET_ACTIVE_HIVE_COUNT = 'websocket/set-active-hive-count';
 
@@ -23,7 +23,8 @@ export const SET_HOME_DATA = 'home/set-home-data';
 
 const initialState = {
   user: null,
-  question: null,
+  activeQuestion: null,
+  editQuestion: null,
   homeData: null,
   activeHiveCount: 0,
   // ws: null,
@@ -33,11 +34,10 @@ const initialState = {
 export default function reducer(state = initialState, action) {
 
   switch (action.type) {
-    case SET_QUESTION:
-      // console.log(action.payload)
+    case SET_EDIT_QUESTION:
       return {
         ...state,
-        question: action.payload,
+        editQuestion: action.payload,
       };
 
     case SET_USER:
@@ -61,26 +61,26 @@ export default function reducer(state = initialState, action) {
     case SET_HOME_DATA:
       return {
         ...state,
-        homeData: action.payload,
-        question: action.payload.activeQuestion,
+        previousQuestions: action.payload.previousQuestions,
+        activeQuestion: action.payload.activeQuestion,
       };
 
     case SET_NEXT_VOTING_ROUND: {
       let winningWord = `${action.payload.winningWord}`;
 
-      const question = { ...state.question };
+      const activeQuestion = { ...state.activeQuestion };
 
-      if (question) {
+      if (activeQuestion) {
         if (winningWord === '(complete-answer)') {
-          question.endTime = true;
+          activeQuestion.endTime = true;
         } else if (winningWord) {
-          question.answer = `${question.answer} ${winningWord}`.trim();
+          activeQuestion.answer = `${activeQuestion.answer} ${winningWord}`.trim();
         }
       }
 
       return {
         ...state,
-        question,
+        activeQuestion,
       };
     }
 
@@ -107,10 +107,17 @@ export function createUser(data) {
 
 export function fetchQuestion(questionId) {
   return dispatch => {
+    if (questionId === 'new') {
+      dispatch({
+        type: SET_EDIT_QUESTION,
+        payload: {},
+      });
+      return Promise.resolve();
+    }
     return axiosClient.get(`/question/${questionId}`).then(res => {
       if (res) {
         dispatch({
-          type: SET_QUESTION,
+          type: SET_EDIT_QUESTION,
           payload: res.data,
         });
       }
@@ -120,12 +127,15 @@ export function fetchQuestion(questionId) {
 
 export function saveQuestion(question) {
   return dispatch => {
-    return axiosClient.put(`/question/${question.id}`, question).then(res => {
+    const reqMethod = question.id ? 'put' : 'post';
+    const reqUrl = question.id ? `/question/${question.id}` : '/questions';
+    return axiosClient[reqMethod](reqUrl, question).then(res => {
       if (res) {
         dispatch({
-          type: SET_QUESTION,
+          type: SET_EDIT_QUESTION,
           payload: res.data,
         });
+        return res;
       }
     });
   };

@@ -28,8 +28,8 @@ class Home extends Component {
   }
 
   render() {
-    const { user, logout, homeData, question, activeHiveCount } = this.props;
-    if (!homeData) { return (<div>loading</div>) }
+    const { user, logout, previousQuestions, activeQuestion, activeHiveCount } = this.props;
+    if (!previousQuestions) { return (<div>loading</div>) }
 
     return (
       <div className="home-container">
@@ -42,7 +42,7 @@ class Home extends Component {
           <div className="left-column">
             <div className="label">Past Questions</div>
             {
-              (homeData.previousQuestions || []).map((question, idx) => (
+              (previousQuestions || []).map((question, idx) => (
                 <Link to={`/question/${question.id}`} key={`prev-question-${idx}`}>
                   <div className="question-container">
                     <div><b>{question.questionText}</b></div>
@@ -53,12 +53,7 @@ class Home extends Component {
             }
           </div>
           <div className="right-column">
-            {/*<div className="label">Question</div>
-            <h1 className="big-text">{homeData.activeQuestion.questionText}</h1>
-            <div className="label">Answer</div>
-            <h1 className="big-text">{homeData.activeQuestion.answer}</h1>*/}
-
-            { !!question && <ActiveQuestion/> }
+            { !!activeQuestion && <ActiveQuestion/> }
           </div>
         </div>
       </div>
@@ -68,12 +63,12 @@ class Home extends Component {
 }
 
 const mapStateToProps = state => {
-  const { activeHiveCount, user, question, homeData } = state;
+  const { activeHiveCount, user, activeQuestion, previousQuestions } = state;
 
   return {
     activeHiveCount,
-    homeData,
-    question,
+    previousQuestions,
+    activeQuestion,
     user,
   };
 };

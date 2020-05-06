@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from "react-router-dom";
 
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
@@ -10,6 +11,7 @@ import '../styles/login-overlay.css';
 
 function LoggedInOverlay({ logout, user }) {
   const [show, setShow] = useState(false);
+  const history = useHistory();
 
   const target = useRef(null);
 
@@ -32,7 +34,9 @@ function LoggedInOverlay({ logout, user }) {
                 ...props.style,
               }}
             >
-              <a href="#" onClick={() => logout()}>logout</a>
+              <div><a href="#" onClick={() => logout()}>logout</a></div>
+              <div><a href="/question/new">href new q</a></div>
+              <div><a href="#" onClick={() => history.push('/question/new')}>push new q</a></div>
             </div>
           )
         }}

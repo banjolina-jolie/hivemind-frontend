@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 // import { useHistory } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { fetchQuestion, setActiveHiveCount, setNextVotingRound } from './reducer';
+import { setActiveHiveCount, setNextVotingRound } from './reducer';
 import './active-question-styles.css';
 
 const wsUrl = 'ws://localhost:9001';
@@ -29,11 +29,11 @@ class ActiveQuestion extends Component {
   };
 
   submitVote = text => {
-    const { question, user } = this.props;
+    const { activeQuestion, user } = this.props;
 
     if (!this.ws) { return }
 
-    const str = `${user.id} ${text} ${question.id}`;
+    const str = `${user.id} ${text} ${activeQuestion.id}`;
     this.ws.send(str);
     this.setState({ text });
   };
@@ -42,11 +42,11 @@ class ActiveQuestion extends Component {
     const {
       setActiveHiveCount,
       setNextVotingRound,
-      question,
+      activeQuestion,
       user,
     } = this.props;
 
-    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}&user=${user && user.id}`);
+    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${activeQuestion.id}&user=${user && user.id}`);
 
     this.ws.onmessage = ({ data }) => {
       const isObject = data.indexOf('}') !== -1;
@@ -90,6 +90,7 @@ class ActiveQuestion extends Component {
 
   componentWillUnmount() {
     clearInterval(this.refreshTimer);
+    this.ws.close();
   }
 
   componentDidMount() {
@@ -109,49 +110,49 @@ class ActiveQuestion extends Component {
   }
 
   render() {
-    const { question, user } = this.props;
+    const { activeQuestion, user } = this.props;
     const { rankedScoreArr } = this.state;
 
-    const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || question.votingRoundEndTime;
+    const votingRoundEndTime = (this.state.votingRoundEndTime && Number(this.state.votingRoundEndTime)) || activeQuestion.votingRoundEndTime;
     let secondsLeft = '';
 
     if (votingRoundEndTime) {
       secondsLeft = Math.ceil((new Date(votingRoundEndTime).getTime() - Date.now()) / 1000);
     }
 
-    const startTime = new Date(question.startTime);
-    const questionIsActive = Date.now() >= startTime;
+    const startTime = new Date(activeQuestion.startTime);
+    const questionHasStarted = Date.now() >= startTime;
     const winningWord = rankedScoreArr && rankedScoreArr[0] && rankedScoreArr[0][0];
 
     return (
       <div>
-        { !question.endTime && !questionIsActive && this.renderTooEarly(secondsLeft) }
-        { !question.endTime && questionIsActive && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
-        { question.endTime && 'Voting done' }
+        { !activeQuestion.endTime && !questionHasStarted && this.renderTooEarly(secondsLeft) }
+        { !activeQuestion.endTime && questionHasStarted && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
+        { activeQuestion.endTime && 'Voting done' }
         <br/>
         <div className="label">Question</div>
-        <div className="big-text">{question.questionText}</div>
+        <div className="big-text">{activeQuestion.questionText}</div>
         <div className="label">Answer</div>
         <div className="big-text">
-          {question.answer}{ !question.endTime && (
+          {activeQuestion.answer}{ !activeQuestion.endTime && (
             <div className="word-scores">
-              { questionIsActive && winningWord !== '(complete-answer)' && <span className="winning-word-underline"></span> }
+              { questionHasStarted && winningWord !== '(complete-answer)' && <span className="winning-word-underline"></span> }
               { this.renderScores() }
             </div>
           )}
         </div>
         <br/>
 
-        { questionIsActive && user && this.renderVoting(secondsLeft) }
+        { questionHasStarted && user && this.renderVoting(secondsLeft) }
 
       </div>
     );
   }
 
   renderVoting(secondsLeft) {
-    const { question } = this.props;
+    const { activeQuestion } = this.props;
 
-    if (question.endTime) {
+    if (activeQuestion.endTime) {
       return null;
     }
 
@@ -220,16 +221,15 @@ class ActiveQuestion extends Component {
 }
 
 const mapStateToProps = state => {
-  const { user, question } = state;
+  const { user, activeQuestion } = state;
 
   return {
     user,
-    question
+    activeQuestion
   };
 };
 
 const mapDispatchToProps = {
-  fetchQuestion,
   setNextVotingRound,
   setActiveHiveCount,
 };

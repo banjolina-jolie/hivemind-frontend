@@ -6,9 +6,12 @@ import DateTimePicker from 'react-datetime-picker';
 import { connect } from 'react-redux';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import Spinner from 'react-bootstrap/Spinner';
 
 import LoggedInOverlay from './logged-in-overlay';
 import LoginOverlay from './login-overlay';
+
+import { withRouter } from "react-router";
 
 import { fetchQuestion, fetchUser, saveQuestion } from '../reducer';
 
@@ -18,50 +21,56 @@ class EditQuestion extends Component {
     questionText: '',
     answer: '',
     startTime: null,
+    loading: false,
   };
 
   save = () => {
-    const { question, saveQuestion, user } = this.props;
-
+    const { editQuestion, saveQuestion, user, history } = this.props;
     const { questionText, answer, startTime, endTime } = this.state;
 
+    this.setState({ loading: true });
+
     saveQuestion({
-      ...question,
+      ...editQuestion,
       questionText,
       answer,
       startTime,
       endTime,
+    })
+    .then(({ data }) => {
+      history.push(`/question/${data.id}`);
+    })
+    .finally(() => {
+      this.setState({ loading: false });
     });
 
   };
 
+  updateQuestionState = () => {
+    const { editQuestion } = this.props;
+    this.setState({
+      questionText: editQuestion.questionText || '',
+      answer: editQuestion.answer || '',
+      startTime: editQuestion.startTime && new Date(editQuestion.startTime),
+      endTime: editQuestion.endTime && new Date(editQuestion.endTime),
+    });
+  };
+
   componentDidMount() {
     const {
-      question,
+      editQuestion,
       fetchQuestion,
       match: { params: { questionId } },
     } = this.props;
 
-    if (!question) {
-      fetchQuestion(questionId);
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    const { question } = this.props;
-    if (!prevProps.question && question) {
-      this.setState({
-        questionText: question.questionText,
-        answer: question.answer || '',
-        startTime: new Date(question.startTime),
-        endTime: new Date(question.endTime),
-      })
-    }
+    fetchQuestion(questionId).then(() => {
+      this.updateQuestionState();
+    });
   }
 
   render() {
-    const { question, user }= this.props;
-    if (!question) return null;
+    const { editQuestion, user }= this.props;
+    if (!editQuestion) return null;
 
     return (
       <div className="home-container">
@@ -100,14 +109,14 @@ class EditQuestion extends Component {
                   We'll never share your email with anyone else.
                 </Form.Text>*/}
               </Form.Group>
-              <Form.Group controlId="answer">
-                <Form.Label>Answer</Form.Label>
-                <Form.Control
-                  placeholder="Answer"
-                  value={this.state.answer}
-                  onChange={e => this.setState({ answer: e.target.value})}
-                />
-              </Form.Group>
+              {
+                this.state.answer && (
+                  <Form.Group controlId="answer">
+                    <Form.Label>Answer</Form.Label>
+                    <div><b>{this.state.answer}</b></div>
+                  </Form.Group>
+                )
+              }
               <Form.Group controlId="startTime">
                 <Form.Label>Start time</Form.Label>
                 <div>
@@ -116,28 +125,22 @@ class EditQuestion extends Component {
                     onChange={startTime => this.setState({ startTime })}
                     value={this.state.startTime}
                     disableClock={true}
-                    // minDate={new Date()}
                     calendarIcon={null}
                   />
                 </div>
               </Form.Group>
-              <Form.Group controlId="endTime">
-                <Form.Label>End time</Form.Label>
-                <div>
-                  <DateTimePicker
-                    className="form-control"
-                    value={this.state.endTime}
-                    disableClock={true}
-                    // minDate={new Date()}
-                    calendarIcon={null}
-                    disabled={true}
-                  />
-                </div>
-              </Form.Group>
-
-
-              <Button variant="primary" onClick={() => this.save()}>
-                Save
+              {
+                editQuestion.id && this.state.endTime && (
+                  <Form.Group controlId="endTime">
+                    <Form.Label>End time</Form.Label>
+                    <div>
+                      {window.moment(this.state.endTime).format('M/D/YYYY h:mm a')}
+                    </div>
+                  </Form.Group>
+                )
+              }
+              <Button variant="primary" onClick={() => this.save()} disabled={this.state.loading}>
+                {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}
               </Button>
             </Form>
           </div>
@@ -148,10 +151,10 @@ class EditQuestion extends Component {
 }
 
 const mapStateToProps = state => {
-  const { user, question } = state;
+  const { user, editQuestion } = state;
 
   return {
-    question,
+    editQuestion,
     user,
   };
 };
@@ -162,4 +165,4 @@ const mapDispatchToProps = {
   saveQuestion,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditQuestion);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(EditQuestion));
