@@ -9,6 +9,8 @@ export const CREATE_USER = 'create-user/LOAD';
 export const CREATE_USER_SUCCESS = 'create-user/LOAD_SUCCESS';
 export const CREATE_USER_FAIL = 'create-user/LOAD_FAIL';
 
+export const SET_QUESTIONS = 'questions/set-questions';
+
 export const SET_EDIT_QUESTION = 'question/set-edit-question';
 export const SET_NEXT_VOTING_ROUND = 'question/set-next-voting-round';
 export const SET_ACTIVE_HIVE_COUNT = 'websocket/set-active-hive-count';
@@ -27,7 +29,7 @@ const initialState = {
   editQuestion: null,
   homeData: null,
   activeHiveCount: 0,
-  // ws: null,
+  questions: null,
 };
 
 
@@ -44,6 +46,12 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         user: action.payload.user,
+      };
+
+    case SET_QUESTIONS:
+      return {
+        ...state,
+        questions: action.payload,
       };
 
     case SET_WEBSOCKET:
@@ -105,7 +113,7 @@ export function createUser(data) {
   };
 }
 
-export function fetchQuestion(questionId) {
+export function fetchEditQuestion(questionId) {
   return dispatch => {
     if (questionId === 'new') {
       dispatch({
@@ -199,6 +207,19 @@ export function fetchHomeData() {
       if (res) {
         dispatch({
           type: SET_HOME_DATA,
+          payload: res.data,
+        });
+      }
+    });
+  };
+}
+
+export function fetchQuestions() {
+  return dispatch => {
+    return axiosClient.get('/questions').then(res => {
+      if (res) {
+        dispatch({
+          type: SET_QUESTIONS,
           payload: res.data,
         });
       }

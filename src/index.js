@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import Home from './home';
 import EditQuestion from './components/edit-question';
+import QuestionList from './components/question-list';
 
 const middlewares = [
   thunk,
@@ -22,6 +23,7 @@ ReactDOM.render(
   <Provider store={store}>
     <Router>
       <Switch>
+        <Route path="/questions" component={QuestionList}/>
         <Route path="/question/:questionId" component={EditQuestion}/>
         <Route path="/" component={Home}/>
       </Switch>

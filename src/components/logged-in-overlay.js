@@ -35,8 +35,8 @@ function LoggedInOverlay({ logout, user }) {
               }}
             >
               <div><a href="#" onClick={() => logout()}>logout</a></div>
-              <div><a href="/question/new">href new q</a></div>
-              <div><a href="#" onClick={() => history.push('/question/new')}>push new q</a></div>
+              <div><a href="#" onClick={() => history.push('/questions')}>all questions</a></div>
+              <div><a href="#" onClick={() => history.push('/question/new')}>create new question</a></div>
             </div>
           )
         }}

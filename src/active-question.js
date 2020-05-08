@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import { useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { setActiveHiveCount, setNextVotingRound } from './reducer';
 import './active-question-styles.css';
@@ -46,7 +46,8 @@ class ActiveQuestion extends Component {
       user,
     } = this.props;
 
-    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${activeQuestion.id}&user=${user && user.id}`);
+    const authToken = localStorage.getItem('authToken');
+    this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${activeQuestion.id}&user=${user && user.id}&auth=${authToken}`);
 
     this.ws.onmessage = ({ data }) => {
       const isObject = data.indexOf('}') !== -1;
@@ -130,7 +131,9 @@ class ActiveQuestion extends Component {
         { !activeQuestion.endTime && questionHasStarted && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
         { activeQuestion.endTime && 'Voting done' }
         <br/>
-        <div className="label">Question</div>
+        <div className="label">
+          <Link to={`/question/${activeQuestion.id}`}>Question</Link>
+        </div>
         <div className="big-text">{activeQuestion.questionText}</div>
         <div className="label">Answer</div>
         <div className="big-text">

@@ -13,7 +13,7 @@ import LoginOverlay from './login-overlay';
 
 import { withRouter } from "react-router";
 
-import { fetchQuestion, fetchUser, saveQuestion } from '../reducer';
+import { fetchEditQuestion, fetchUser, saveQuestion } from '../reducer';
 
 class EditQuestion extends Component {
 
@@ -59,11 +59,11 @@ class EditQuestion extends Component {
   componentDidMount() {
     const {
       editQuestion,
-      fetchQuestion,
+      fetchEditQuestion,
       match: { params: { questionId } },
     } = this.props;
 
-    fetchQuestion(questionId).then(() => {
+    fetchEditQuestion(questionId).then(() => {
       this.updateQuestionState();
     });
   }
@@ -160,7 +160,7 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {
-  fetchQuestion,
+  fetchEditQuestion,
   fetchUser,
   saveQuestion,
 };
