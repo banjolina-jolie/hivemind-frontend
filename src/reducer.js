@@ -82,7 +82,8 @@ export default function reducer(state = initialState, action) {
         if (winningWord === '(complete-answer)') {
           activeQuestion.endTime = true;
         } else if (winningWord) {
-          activeQuestion.answer = `${activeQuestion.answer} ${winningWord}`.trim();
+          let prevAnswer = activeQuestion.answer || '';
+          activeQuestion.answer = `${prevAnswer} ${winningWord}`.trim();
         }
       }
 

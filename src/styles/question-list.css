@@ -1,0 +1,9 @@
+.question-list-body {
+margin-top: 50px;
+}
+
+.question-li-container {
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-import '../styles/edit-question.css';
+import '../styles/question-list.css';
 import '../home.css';
 import DateTimePicker from 'react-datetime-picker';
 import { connect } from 'react-redux';
@@ -39,13 +39,12 @@ class QuestionList extends Component {
           <div></div>
           {user ? <LoggedInOverlay /> : <LoginOverlay /> }
         </div>
-        <div className="">
+        <div className="question-list-body">
           {questions.map((q, idx) => (
-            <div key={`question-list-item-${idx}`}>
-              <b>{q.questionText}</b>
-              <i>{q.answer}</i>
-              <div>{q.startTime}</div>
-              <div>____________________________</div>
+            <div className="question-li-container" key={`question-list-item-${idx}`}>
+              <div><b><Link to={`/question/${q.id}`}>{q.questionText}</Link></b></div>
+              <div><i>{q.answer}</i></div>
+              <div>{q.startTime && window.moment(q.startTime).format('MM/DD/YYYY h:mma')}</div>
             </div>
           ))}
         </div>
