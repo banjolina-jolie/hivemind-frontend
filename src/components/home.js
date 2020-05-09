@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
-import './home.css';
 import { connect } from 'react-redux';
-import {
-  // BrowserRouter as Router,
-  // Switch,
-  // Route,
-  Link
-} from "react-router-dom";
+import { Link } from 'react-router-dom';
 
-import Header from './components/header';
+import '../styles/home.css';
 
+import Header from './header';
 import ActiveQuestion from './active-question';
 
-import { fetchUser, logout, fetchHomeData } from './reducer';
+import { fetchUser, fetchHomeData } from '../reducer';
+
 
 class Home extends Component {
 
@@ -27,7 +23,7 @@ class Home extends Component {
   }
 
   render() {
-    const { user, logout, previousQuestions, activeQuestion, activeHiveCount } = this.props;
+    const { user, previousQuestions, activeQuestion, activeHiveCount } = this.props;
     if (!previousQuestions) { return (<div>loading</div>) }
 
     return (
@@ -72,7 +68,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = {
   fetchHomeData,
   fetchUser,
-  logout,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

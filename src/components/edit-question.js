@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-import '../styles/edit-question.css';
-import '../home.css';
+import { withRouter } from "react-router";
 import DateTimePicker from 'react-datetime-picker';
 import { connect } from 'react-redux';
 import Button from 'react-bootstrap/Button';
@@ -10,7 +9,8 @@ import Spinner from 'react-bootstrap/Spinner';
 
 import Header from './header';
 
-import { withRouter } from "react-router";
+import '../styles/edit-question.css';
+import '../styles/home.css';
 
 import { fetchEditQuestion, fetchUser, saveQuestion } from '../reducer';
 
@@ -70,7 +70,6 @@ class EditQuestion extends Component {
 
   componentDidMount() {
     const {
-      editQuestion,
       fetchEditQuestion,
       match: { params: { questionId } },
     } = this.props;

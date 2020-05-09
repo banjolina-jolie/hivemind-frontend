@@ -6,10 +6,10 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import thunk from 'redux-thunk';
 import reducer from './reducer';
 
-import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './styles/index.css';
 
-import Home from './home';
+import Home from './components/home';
 import EditQuestion from './components/edit-question';
 import QuestionList from './components/question-list';
 

@@ -1,5 +1,4 @@
 import { axiosClient } from './axios';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 
 export const AUTHENTICATE_USER = 'auth-user/LOAD';
 export const AUTHENTICATE_USER_SUCCESS = 'auth-user/LOAD_SUCCESS';
@@ -16,9 +15,6 @@ export const SET_NEXT_VOTING_ROUND = 'question/set-next-voting-round';
 export const SET_ACTIVE_HIVE_COUNT = 'websocket/set-active-hive-count';
 
 export const SET_USER = 'user/set-user';
-
-export const SET_WEBSOCKET = 'websocket/set-websocket';
-
 
 
 export const SET_HOME_DATA = 'home/set-home-data';
@@ -52,12 +48,6 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         questions: action.payload,
-      };
-
-    case SET_WEBSOCKET:
-      return {
-        ...state,
-        ws: action.payload,
       };
 
     case SET_ACTIVE_HIVE_COUNT:
@@ -236,15 +226,3 @@ export function setActiveHiveCount(count) {
     },
   }
 }
-
-// export function connectToWs() {
-//   return dispatch => {
-//     const ws = new ReconnectingWebSocket(`${wsUrl}?question=${question.id}`);
-//     return {
-//       dispatch({
-//         type: SET_WEBSOCKET,
-//         payload: ws,
-//       });
-//     }
-//   };
-// }

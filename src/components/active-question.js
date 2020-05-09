@@ -2,20 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { setActiveHiveCount, setNextVotingRound } from './reducer';
-import './active-question-styles.css';
+
+import '../styles/active-question-styles.css';
+
+import { setActiveHiveCount, setNextVotingRound } from '../reducer';
 
 const wsUrl = 'ws://localhost:9001';
 // const wsUrl = 'ws://hivemind-ws.herokuapp.com';
-
-// function NavButton() {
-//   const history = useHistory();
-//   return (
-//     <button onClick={() => {
-//       history.push('/');
-//     }}>nav</button>
-//   );
-// }
 
 class ActiveQuestion extends Component {
   state = {

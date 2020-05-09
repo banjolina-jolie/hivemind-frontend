@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-import '../styles/question-list.css';
-import '../home.css';
 import { connect } from 'react-redux';
-
-import LoggedInOverlay from './logged-in-overlay';
-import Header from './header';
-
 import { withRouter } from "react-router";
 
+import Header from './header';
+
+import '../styles/question-list.css';
+
 import { fetchQuestions } from '../reducer';
+
 
 class QuestionList extends Component {
 
@@ -27,7 +26,7 @@ class QuestionList extends Component {
     if (!questions) return null;
 
     return (
-      <div className="home-container">
+      <div>
         <Header />
         <div className="question-list-body">
           {questions.map((q, idx) => (
