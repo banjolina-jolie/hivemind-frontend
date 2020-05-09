@@ -40,6 +40,9 @@ class ActiveQuestion extends Component {
     } = this.props;
 
     const authToken = localStorage.getItem('authToken');
+    if (this.ws) {
+      this.ws.close();
+    }
     this.ws = new ReconnectingWebSocket(`${wsUrl}?question=${activeQuestion.id}&user=${user && user.id}&auth=${authToken}`);
 
     this.ws.onmessage = ({ data }) => {
@@ -99,7 +102,7 @@ class ActiveQuestion extends Component {
 
   componentDidUpdate(prevProps) {
     if (!prevProps.user && this.props.user) {
-      // this.connectToWebsocket();
+      this.connectToWebsocket();
     }
   }
 

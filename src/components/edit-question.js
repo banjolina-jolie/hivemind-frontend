@@ -7,10 +7,10 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 
-import Header from './header';
-
 import '../styles/edit-question.css';
 import '../styles/home.css';
+
+import Header from './header';
 
 import { fetchEditQuestion, fetchUser, saveQuestion } from '../reducer';
 

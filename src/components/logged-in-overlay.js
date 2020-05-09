@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Overlay from 'react-bootstrap/Overlay';
 
-import { logout } from '../reducer';
-
 import '../styles/login-overlay.css';
+
+import { logout } from '../reducer';
 
 function LoggedInOverlay({ logout, user }) {
   const [show, setShow] = useState(false);
