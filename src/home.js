@@ -8,8 +8,7 @@ import {
   Link
 } from "react-router-dom";
 
-import LoggedInOverlay from './components/logged-in-overlay';
-import LoginOverlay from './components/login-overlay';
+import Header from './components/header';
 
 import ActiveQuestion from './active-question';
 
@@ -32,12 +31,9 @@ class Home extends Component {
     if (!previousQuestions) { return (<div>loading</div>) }
 
     return (
-      <div className="home-container">
-        <div className="home-header">
-          <b>Hivemind</b>
-          <div>The hive is live with  {activeHiveCount.toLocaleString()} minds</div>
-          {user ? <LoggedInOverlay /> : <LoginOverlay /> }
-        </div>
+      <div>
+        <Header centerContent={`The hive is live with  ${activeHiveCount.toLocaleString()} minds`}/>
+
         <div className="home-body">
           <div className="left-column">
             <div className="label">Past Questions</div>

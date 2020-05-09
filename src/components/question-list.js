@@ -2,14 +2,10 @@ import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import '../styles/question-list.css';
 import '../home.css';
-import DateTimePicker from 'react-datetime-picker';
 import { connect } from 'react-redux';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Spinner from 'react-bootstrap/Spinner';
 
 import LoggedInOverlay from './logged-in-overlay';
-import LoginOverlay from './login-overlay';
+import Header from './header';
 
 import { withRouter } from "react-router";
 
@@ -32,13 +28,7 @@ class QuestionList extends Component {
 
     return (
       <div className="home-container">
-        <div className="home-header">
-          <Link to="/">
-            <b>Hivemind</b>
-          </Link>
-          <div></div>
-          {user ? <LoggedInOverlay /> : <LoginOverlay /> }
-        </div>
+        <Header />
         <div className="question-list-body">
           {questions.map((q, idx) => (
             <div className="question-li-container" key={`question-list-item-${idx}`}>

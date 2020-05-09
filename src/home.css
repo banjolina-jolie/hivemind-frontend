@@ -1,11 +1,3 @@
-.home-container {
-  margin: 40px;
-}
-.home-header {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
 .home-body {
   display: flex;
   flex-direction: row;

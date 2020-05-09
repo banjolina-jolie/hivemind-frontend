@@ -8,8 +8,7 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Spinner from 'react-bootstrap/Spinner';
 
-import LoggedInOverlay from './logged-in-overlay';
-import LoginOverlay from './login-overlay';
+import Header from './header';
 
 import { withRouter } from "react-router";
 
@@ -25,7 +24,7 @@ class EditQuestion extends Component {
   };
 
   save = () => {
-    const { editQuestion, saveQuestion, user, history } = this.props;
+    const { editQuestion, saveQuestion, history } = this.props;
     const { questionText, answer, startTime, endTime } = this.state;
 
     this.setState({ loading: true });
@@ -44,6 +43,19 @@ class EditQuestion extends Component {
       this.setState({ loading: false });
     });
 
+  };
+
+  startInTen = () => {
+    const { editQuestion, saveQuestion, history } = this.props;
+    const TEN_SECONDS = 1000 * 10;
+    const startTime = new Date(Date.now() + TEN_SECONDS);
+    saveQuestion({
+      ...editQuestion,
+      startTime,
+    })
+    .then(() => {
+      history.push('/');
+    });
   };
 
   updateQuestionState = () => {
@@ -73,14 +85,9 @@ class EditQuestion extends Component {
     if (!editQuestion) return null;
 
     return (
-      <div className="home-container">
-        <div className="home-header">
-          <Link to="/">
-            <b>Hivemind</b>
-          </Link>
-          <div></div>
-          {user ? <LoggedInOverlay /> : <LoginOverlay /> }
-        </div>
+      <div>
+        <Header />
+
         <div className="home-body">
           <div className="left-column">
             <div className="label">Past Questions</div>
@@ -96,7 +103,6 @@ class EditQuestion extends Component {
             */}
           </div>
           <div className="right-column">
-
             <Form>
               <Form.Group controlId="question">
                 <Form.Label>Question</Form.Label>
@@ -142,6 +148,12 @@ class EditQuestion extends Component {
               <Button variant="primary" onClick={() => this.save()} disabled={this.state.loading}>
                 {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}
               </Button>
+
+              {editQuestion.id && (
+                <div><Button variant="primary" onClick={() => this.startInTen()} disabled={this.state.loading}>
+                  {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Start in 10 seconds'}
+                </Button></div>
+              )}
             </Form>
           </div>
         </div>
