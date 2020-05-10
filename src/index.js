@@ -23,8 +23,8 @@ ReactDOM.render(
   <Provider store={store}>
     <Router>
       <Switch>
-        <Route path="/questions" component={QuestionList}/>
         <Route path="/question/:questionId" component={EditQuestion}/>
+        <Route path="/questions" component={QuestionList}/>
         <Route path="/" component={Home}/>
       </Switch>
     </Router>

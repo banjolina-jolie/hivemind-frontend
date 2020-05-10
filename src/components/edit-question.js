@@ -18,23 +18,28 @@ class EditQuestion extends Component {
 
   state = {
     questionText: '',
-    answer: '',
     startTime: null,
+    votingInterval: 0,
     loading: false,
   };
 
   save = () => {
     const { editQuestion, saveQuestion, history } = this.props;
-    const { questionText, answer, startTime, endTime } = this.state;
+    const {
+      questionText,
+      startTime,
+      endTime,
+      votingInterval,
+    } = this.state;
 
     this.setState({ loading: true });
 
     saveQuestion({
       ...editQuestion,
       questionText,
-      answer,
       startTime,
       endTime,
+      votingInterval,
     })
     .then(({ data }) => {
       history.push(`/question/${data.id}`);
@@ -62,9 +67,9 @@ class EditQuestion extends Component {
     const { editQuestion } = this.props;
     this.setState({
       questionText: editQuestion.questionText || '',
-      answer: editQuestion.answer || '',
       startTime: editQuestion.startTime && new Date(editQuestion.startTime),
       endTime: editQuestion.endTime && new Date(editQuestion.endTime),
+      votingInterval: editQuestion.votingInterval,
     });
   };
 
@@ -144,6 +149,19 @@ class EditQuestion extends Component {
                     </Form.Group>
                   )
                 }
+                <Form.Group controlId="question">
+                  <Form.Label>Voting interval (seconds)</Form.Label>
+                  <Form.Control
+                    className="voting-interval"
+                    placeholder="Question"
+                    type="number"
+                    value={this.state.votingInterval}
+                    onChange={e => this.setState({ votingInterval: Number(e.target.value) })}
+                  />
+                  {/*<Form.Text className="text-muted">
+                    We'll never share your email with anyone else.
+                  </Form.Text>*/}
+                </Form.Group>
                 <Button variant="primary" onClick={() => this.save()} disabled={this.state.loading}>
                   {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}
                 </Button>

@@ -33,7 +33,7 @@ function LoggedInOverlay({ logout, user }) {
             >
               <div><a href="#" onClick={() => logout()}>logout</a></div>
               <div><Link to="/questions">all questions</Link></div>
-              <div><Link to="/questions/new">all questions</Link></div>
+              { user.isAdmin && (<div><Link to="/question/new">create question</Link></div>) }
             </div>
           )
         }}

@@ -6,7 +6,6 @@
 }
 
 .scored-word {
-  cursor: pointer;
   font-weight: bold;
 }
 
@@ -31,4 +30,8 @@
   position: absolute;
   top: 54px;
   margin-left: 12px;
+}
+
+.voting-action-el {
+  margin-right: 10px;
 }

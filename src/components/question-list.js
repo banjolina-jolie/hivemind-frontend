@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom";
 import { connect } from 'react-redux';
 import { withRouter } from "react-router";
 
-import Header from './header';
-
 import '../styles/question-list.css';
+
+import AdminOnlyLink from './admin-only-link';
+import Header from './header';
 
 import { fetchQuestions } from '../reducer';
 
@@ -31,9 +31,9 @@ class QuestionList extends Component {
         <div className="question-list-body">
           {questions.map((q, idx) => (
             <div className="question-li-container" key={`question-list-item-${idx}`}>
-              <div><b><Link to={`/question/${q.id}`}>{q.questionText}</Link></b></div>
+              <div><b><AdminOnlyLink to={`/question/${q.id}`}>{q.questionText}</AdminOnlyLink></b></div>
               <div><i>{q.answer}</i></div>
-              <div>{q.startTime && window.moment(q.startTime).format('MM/DD/YYYY h:mma')}</div>
+              <div>{q.startTime && window.moment(q.startTime).format('MMMM Do YYYY h:mma')}</div>
             </div>
           ))}
         </div>

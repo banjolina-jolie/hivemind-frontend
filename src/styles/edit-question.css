@@ -11,3 +11,7 @@
 .form-control .react-datetime-picker__inputGroup {
   flex-grow: unset;
 }
+
+.voting-interval {
+  width: auto;
+}

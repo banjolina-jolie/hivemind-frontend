@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-import '../styles/active-question-styles.css';
+import '../styles/active-question.css';
 
 import AdminOnlyLink from './admin-only-link';
 
@@ -128,11 +128,15 @@ class ActiveQuestion extends Component {
         { !activeQuestion.endTime && questionHasStarted && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
         { activeQuestion.endTime && 'Voting done' }
         <br/>
+        <br/>
         <div className="label">
           <AdminOnlyLink to={`/question/${activeQuestion.id}`}>Question</AdminOnlyLink>
         </div>
         <div className="big-text">{activeQuestion.questionText}</div>
         <div className="label">Answer</div>
+        <br/>
+        { questionHasStarted && user && this.renderVotingActionEls(secondsLeft) }
+
         <div className="big-text">
           {activeQuestion.answer}{ !activeQuestion.endTime && (
             <div className="word-scores">
@@ -141,15 +145,12 @@ class ActiveQuestion extends Component {
             </div>
           )}
         </div>
-        <br/>
-
-        { questionHasStarted && user && this.renderVoting(secondsLeft) }
 
       </div>
     );
   }
 
-  renderVoting(secondsLeft) {
+  renderVotingActionEls(secondsLeft) {
     const { activeQuestion } = this.props;
 
     if (activeQuestion.endTime) {
@@ -164,11 +165,12 @@ class ActiveQuestion extends Component {
           })}
           value={this.state.text}
           maxLength={35}
+          className="voting-action-el"
         />
-        <button onClick={() => this.submitTypedVote()} disabled={secondsLeft <= 0}>
+        <button onClick={() => this.submitTypedVote()} disabled={secondsLeft <= 0} className="voting-action-el">
           submit
         </button>
-        <button onClick={() => this.submitVote('(complete-answer)')} disabled={secondsLeft <= 0}>
+        <button onClick={() => this.submitVote('(complete-answer)')} disabled={secondsLeft <= 0} className="voting-action-el">
           Vote complete ✓
         </button>
       </div>
@@ -195,9 +197,9 @@ class ActiveQuestion extends Component {
     let topScore = Number(rankedScoreArr[0][1]);
 
     return rankedScoreArr && rankedScoreArr.map(([word, score], idx) => {
-      let opacity = 0.8 * (Number(score) / topScore);
+      let opacity = 0.95 * (Number(score) / topScore);
 
-      if (opacity < 0.10) { opacity = 0.10; }
+      if (opacity < 0.15) { opacity = 0.15; }
 
       return (
         <div key={idx}>
@@ -206,7 +208,7 @@ class ActiveQuestion extends Component {
             onClick={() => user && this.submitVote(word)}
             style={{
               cursor: user ? 'pointer' : 'default',
-              color: `rgba(0, 0, 0, ${opacity}`,
+              color: `rgba(33,37,41, ${opacity}`,
               // textDecoration: idx === 0 ? 'underline' : null,
             }}
           >
