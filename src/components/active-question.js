@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from "react-router-dom";
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import '../styles/active-question-styles.css';
+
+import AdminOnlyLink from './admin-only-link';
 
 import { setActiveHiveCount, setNextVotingRound } from '../reducer';
 
@@ -128,7 +129,7 @@ class ActiveQuestion extends Component {
         { activeQuestion.endTime && 'Voting done' }
         <br/>
         <div className="label">
-          <Link to={`/question/${activeQuestion.id}`}>Question</Link>
+          <AdminOnlyLink to={`/question/${activeQuestion.id}`}>Question</AdminOnlyLink>
         </div>
         <div className="big-text">{activeQuestion.questionText}</div>
         <div className="label">Answer</div>

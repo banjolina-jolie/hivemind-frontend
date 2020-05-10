@@ -81,7 +81,6 @@ class EditQuestion extends Component {
 
   render() {
     const { editQuestion, user }= this.props;
-    if (!editQuestion) return null;
 
     return (
       <div>
@@ -102,58 +101,60 @@ class EditQuestion extends Component {
             */}
           </div>
           <div className="right-column">
-            <Form>
-              <Form.Group controlId="question">
-                <Form.Label>Question</Form.Label>
-                <Form.Control
-                  placeholder="Question"
-                  value={this.state.questionText}
-                  onChange={e => this.setState({ questionText: e.target.value})}
-                />
-                {/*<Form.Text className="text-muted">
-                  We'll never share your email with anyone else.
-                </Form.Text>*/}
-              </Form.Group>
-              {
-                this.state.answer && (
-                  <Form.Group controlId="answer">
-                    <Form.Label>Answer</Form.Label>
-                    <div><b>{this.state.answer}</b></div>
-                  </Form.Group>
-                )
-              }
-              <Form.Group controlId="startTime">
-                <Form.Label>Start time</Form.Label>
-                <div>
-                  <DateTimePicker
-                    className="form-control"
-                    onChange={startTime => this.setState({ startTime })}
-                    value={this.state.startTime}
-                    disableClock={true}
-                    calendarIcon={null}
+            {editQuestion && (
+              <Form>
+                <Form.Group controlId="question">
+                  <Form.Label>Question</Form.Label>
+                  <Form.Control
+                    placeholder="Question"
+                    value={this.state.questionText}
+                    onChange={e => this.setState({ questionText: e.target.value})}
                   />
-                </div>
-              </Form.Group>
-              {
-                editQuestion.id && this.state.endTime && (
-                  <Form.Group controlId="endTime">
-                    <Form.Label>End time</Form.Label>
-                    <div>
-                      {window.moment(this.state.endTime).format('M/D/YYYY h:mm a')}
-                    </div>
-                  </Form.Group>
-                )
-              }
-              <Button variant="primary" onClick={() => this.save()} disabled={this.state.loading}>
-                {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}
-              </Button>
+                  {/*<Form.Text className="text-muted">
+                    We'll never share your email with anyone else.
+                  </Form.Text>*/}
+                </Form.Group>
+                {
+                  this.state.answer && (
+                    <Form.Group controlId="answer">
+                      <Form.Label>Answer</Form.Label>
+                      <div><b>{this.state.answer}</b></div>
+                    </Form.Group>
+                  )
+                }
+                <Form.Group controlId="startTime">
+                  <Form.Label>Start time</Form.Label>
+                  <div>
+                    <DateTimePicker
+                      className="form-control"
+                      onChange={startTime => this.setState({ startTime })}
+                      value={this.state.startTime}
+                      disableClock={true}
+                      calendarIcon={null}
+                    />
+                  </div>
+                </Form.Group>
+                {
+                  editQuestion.id && this.state.endTime && (
+                    <Form.Group controlId="endTime">
+                      <Form.Label>End time</Form.Label>
+                      <div>
+                        {window.moment(this.state.endTime).format('M/D/YYYY h:mm a')}
+                      </div>
+                    </Form.Group>
+                  )
+                }
+                <Button variant="primary" onClick={() => this.save()} disabled={this.state.loading}>
+                  {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}
+                </Button>
 
-              {editQuestion.id && (
-                <div><Button variant="primary" onClick={() => this.startInTen()} disabled={this.state.loading}>
-                  {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Start in 10 seconds'}
-                </Button></div>
-              )}
-            </Form>
+                {editQuestion.id && (
+                  <div><Button variant="primary" onClick={() => this.startInTen()} disabled={this.state.loading}>
+                    {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Start in 10 seconds'}
+                  </Button></div>
+                )}
+              </Form>
+            )}
           </div>
         </div>
       </div>

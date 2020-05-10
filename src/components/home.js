@@ -6,6 +6,7 @@ import '../styles/home.css';
 
 import Header from './header';
 import ActiveQuestion from './active-question';
+import AdminOnlyLink from './admin-only-link';
 
 import { fetchUser, fetchHomeData } from '../reducer';
 
@@ -35,12 +36,12 @@ class Home extends Component {
             <div className="label">Past Questions</div>
             {
               (previousQuestions || []).map((question, idx) => (
-                <Link to={`/question/${question.id}`} key={`prev-question-${idx}`}>
+                <AdminOnlyLink to={`/question/${question.id}`} key={`prev-question-${idx}`}>
                   <div className="question-container">
                     <div><b>{question.questionText}</b></div>
                     <div>{question.answer}</div>
                   </div>
-                </Link>
+                </AdminOnlyLink>
               ))
             }
           </div>
