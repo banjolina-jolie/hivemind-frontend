@@ -178,6 +178,23 @@ export function submitLogin(email, password) {
   };
 };
 
+export function submitSignup(user) {
+  return dispatch => {
+    return axiosClient.post(`/users`, user).then(res => {
+      if (res) {
+        localStorage.setItem('authToken', res.data.authToken);
+        axiosClient.defaults.headers.common["Authorization"] = `Bearer ${res.data.authToken}`;
+        dispatch({
+          type: SET_USER,
+          payload: {
+            user: res.data,
+          },
+        });
+      }
+    });
+  };
+};
+
 export function fetchUser() {
   return dispatch => {
     return axiosClient.get('/me').then(res => {

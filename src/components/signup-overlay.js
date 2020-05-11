@@ -4,21 +4,22 @@ import { connect } from 'react-redux';
 import Overlay from 'react-bootstrap/Overlay';
 import Button from 'react-bootstrap/Button';
 
-import { submitLogin } from '../reducer';
-
 import '../styles/login-overlay.css';
 
-function LoginOverlay({ submitLogin }) {
+import { submitSignup } from '../reducer';
+
+function SignupOverlay({ submitSignup }) {
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState('b@b.com'); // TODO: ''
-  const [password, setPassword] = useState('123123'); // TODO: ''
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
   const target = useRef(null);
 
   return (
     <div className="header-link">
       <a href="#" ref={target} onClick={() => setShow(!show)}>
-        login
+        signup
       </a>
       <Overlay target={target.current} show={show} placement="bottom" rootClose={true} onHide={() => setShow(false)}>
         {({
@@ -29,7 +30,7 @@ function LoginOverlay({ submitLogin }) {
           return (
             <form
               {...props}
-              className="login-overlay-container"
+              className="login-overlay-container shit"
               style={{
                 ...props.style,
                 left: '-36px',
@@ -38,7 +39,7 @@ function LoginOverlay({ submitLogin }) {
               <div>
                 <div className="test">email</div>
                 <input
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                   placeholder="name@example.com"
                   name="email"
                 />
@@ -46,14 +47,23 @@ function LoginOverlay({ submitLogin }) {
               <div>
                 <div>password</div>
                 <input
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="password"
                   type="password"
                   name="password"
                 />
               </div>
               <div>
-                <Button onClick={() => submitLogin(email, password)}>
+                <div>confirm password</div>
+                <input
+                  onChange={e => setPasswordConfirmation(e.target.value)}
+                  placeholder="confirm password"
+                  type="password"
+                  name="confirm-password"
+                />
+              </div>
+              <div>
+                <Button onClick={() => submitSignup({ email, password, passwordConfirmation })}>
                 submit
                 </Button>
               </div>
@@ -74,8 +84,8 @@ const mapStateToProps = state => {
 };
 
 const mapDispatchToProps = {
-  submitLogin,
+  submitSignup,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginOverlay);
+export default connect(mapStateToProps, mapDispatchToProps)(SignupOverlay);
 

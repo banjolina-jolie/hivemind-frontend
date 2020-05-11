@@ -2,12 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from "react-router-dom";
 
+import '../styles/header.css';
+
 import LoggedInOverlay from './logged-in-overlay';
 import LoginOverlay from './login-overlay';
+import SignupOverlay from './signup-overlay';
 
 import { fetchUser } from '../reducer';
-
-import '../styles/header.css';
 
 class Header extends Component {
 
@@ -29,7 +30,12 @@ class Header extends Component {
 
         <div>{centerContent}</div>
 
-        {user ? <LoggedInOverlay /> : <LoginOverlay /> }
+        {user ? <LoggedInOverlay /> : (
+          <div>
+            <LoginOverlay />
+            <SignupOverlay />
+          </div>
+        )}
       </div>
     );
   }

@@ -124,11 +124,12 @@ class ActiveQuestion extends Component {
 
     return (
       <div>
-        { !activeQuestion.endTime && !questionHasStarted && this.renderTooEarly(secondsLeft) }
-        { !activeQuestion.endTime && questionHasStarted && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
-        { activeQuestion.endTime && 'Voting done' }
-        <br/>
-        <br/>
+        <div className="voting-status">
+          { !activeQuestion.endTime && !questionHasStarted && this.renderTooEarly(secondsLeft) }
+          { !activeQuestion.endTime && questionHasStarted && (secondsLeft > 0 ? secondsLeft : 'Loading next round...') }
+          { activeQuestion.endTime && 'Voting done' }
+        </div>
+
         <div className="label">
           <AdminOnlyLink to={`/question/${activeQuestion.id}`}>Question</AdminOnlyLink>
         </div>
@@ -181,10 +182,10 @@ class ActiveQuestion extends Component {
     const oneDay = 60 * 60 * 24;
     if (Number(secondsLeft) < oneDay) {
       const text = window.moment().hour(0).minute(0).second(Number(secondsLeft)).format('HH:mm:ss');
-      return (<div>Voting starts in: {text}</div>);
+      return `Voting starts in ${text}`;
     } else {
       const text = window.moment(new Date().getTime() + (Number(secondsLeft) * 1000)).calendar();
-      return (<div>Voting starts: {text}</div>);
+      return `Voting starts ${text}`;
     }
   }
 

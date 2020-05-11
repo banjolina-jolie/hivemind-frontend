@@ -13,7 +13,7 @@ function LoggedInOverlay({ logout, user }) {
   const target = useRef(null);
 
   return (
-    <div>
+    <div style={{fontSize: '14px'}}>
       <a href="#" ref={target} onClick={() => setShow(!show)}>
         {user.email}
       </a>

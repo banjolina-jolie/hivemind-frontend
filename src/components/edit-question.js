@@ -166,6 +166,9 @@ class EditQuestion extends Component {
                   {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}
                 </Button>
 
+                <br/>
+                <br/>
+
                 {editQuestion.id && (
                   <div><Button variant="primary" onClick={() => this.startInTen()} disabled={this.state.loading}>
                     {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Start in 10 seconds'}

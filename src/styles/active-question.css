@@ -35,3 +35,9 @@
 .voting-action-el {
   margin-right: 10px;
 }
+
+.voting-status {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #555;
+}
