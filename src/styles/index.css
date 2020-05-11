@@ -1,4 +1,6 @@
 #root {
   font-family: 'Roboto', sans-serif;
-  margin: 40px;
+  padding: 40px;
+  background-color: #f3f3f3;
+  height: 100vh;
 }

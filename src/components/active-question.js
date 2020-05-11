@@ -135,7 +135,6 @@ class ActiveQuestion extends Component {
         </div>
         <div className="big-text">{activeQuestion.questionText}</div>
         <div className="label">Answer</div>
-        <br/>
         { questionHasStarted && user && this.renderVotingActionEls(secondsLeft) }
 
         <div className="big-text">
