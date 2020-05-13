@@ -8,8 +8,7 @@ import AdminOnlyLink from './admin-only-link';
 
 import { setActiveHiveCount, setNextVotingRound } from '../reducer';
 
-const wsUrl = 'ws://localhost:9001';
-// const wsUrl = 'ws://hivemind-ws.herokuapp.com';
+const wsUrl = process.env.REACT_APP_WS_URL;
 
 class ActiveQuestion extends Component {
   state = {

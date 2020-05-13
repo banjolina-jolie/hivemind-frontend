@@ -5,8 +5,7 @@ import { camelCase, snakeCase } from 'change-case';
 
 
 export const axiosClient = axios.create({
-  baseURL: 'http://localhost:3001',
-  // baseURL: 'https://hivemind-rails.herokuapp.com',
+  baseURL: process.env.REACT_APP_BASE_URL,
   responseType: 'json',
   transformRequest: [function (data, headers) {
     const authToken = localStorage.getItem('authToken');
