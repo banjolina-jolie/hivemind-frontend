@@ -22,11 +22,11 @@ class ActiveQuestion extends Component {
   };
 
   submitVote = text => {
-    const { activeQuestion, user } = this.props;
+    const { activeQuestion } = this.props;
 
     if (!this.ws) { return }
 
-    const str = `${user.id} ${text} ${activeQuestion.id}`;
+    const str = `${activeQuestion.id} ${text}`;
     this.ws.send(str);
     this.setState({ text });
   };
