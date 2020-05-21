@@ -3,7 +3,7 @@
 - start [rails](https://github.com/banjolina-jolie/hivemind-rails) and [ws server](https://github.com/banjolina-jolie/hivemind-ws)
 
 ```
-npm  install
+npm install
 npm start
 ```
 
