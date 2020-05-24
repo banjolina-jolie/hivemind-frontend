@@ -2,16 +2,11 @@
   position: relative;
   display: inline-block;
   vertical-align: top;
-  /*font-size: 2.5rem;*/
 }
 
 .scored-word {
   font-weight: bold;
 }
-
-/*.scored-word:hover {
-  color: #444;
-}*/
 
 .big-text {
   font-size: 2.5rem;

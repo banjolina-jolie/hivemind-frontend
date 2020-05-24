@@ -115,9 +115,6 @@ class EditQuestion extends Component {
                     value={this.state.questionText}
                     onChange={e => this.setState({ questionText: e.target.value})}
                   />
-                  {/*<Form.Text className="text-muted">
-                    We'll never share your email with anyone else.
-                  </Form.Text>*/}
                 </Form.Group>
                 {
                   this.state.answer && (
@@ -158,9 +155,6 @@ class EditQuestion extends Component {
                     value={this.state.votingInterval}
                     onChange={e => this.setState({ votingInterval: Number(e.target.value) })}
                   />
-                  {/*<Form.Text className="text-muted">
-                    We'll never share your email with anyone else.
-                  </Form.Text>*/}
                 </Form.Group>
                 <Button variant="primary" onClick={() => this.save()} disabled={this.state.loading}>
                   {this.state.loading ? <Spinner size="sm" animation="border" /> : 'Save'}

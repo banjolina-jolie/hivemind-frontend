@@ -79,8 +79,6 @@ class ActiveQuestion extends Component {
           this.setState({ rankedScoreArr });
 
         }
-      // } else if (data.indexOf(']') !== -1) {
-      //   const scoreArr = JSON.parse(data.slice(0, data.indexOf(']') + 1));
       }
     };
   };
@@ -102,6 +100,9 @@ class ActiveQuestion extends Component {
 
   componentDidUpdate(prevProps) {
     if (!prevProps.user && this.props.user) {
+      this.connectToWebsocket();
+    }
+    if (prevProps.user && !this.props.user) {
       this.connectToWebsocket();
     }
   }
@@ -208,7 +209,6 @@ class ActiveQuestion extends Component {
             style={{
               cursor: user ? 'pointer' : 'default',
               color: `rgba(33,37,41, ${opacity}`,
-              // textDecoration: idx === 0 ? 'underline' : null,
             }}
           >
             {word === '(complete-answer)' && idx === 0 ? '' : (<span>&nbsp;</span>)}

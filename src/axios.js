@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import axios from 'axios';
-// import axiosMiddleware from 'redux-axios-middleware';
 import { camelCase, snakeCase } from 'change-case';
 
 
@@ -20,20 +19,6 @@ export const axiosClient = axios.create({
     return data;
   }],
 });
-
-// axiosClient.interceptors.request.use(async (request) => {
-//   // request.headers.common.Authorization = `Bearer ${token}`;
-//   return request;
-// }, (error) => {
-//   // Do something with request error
-//   return error;
-// });
-
-// axiosClient.interceptors.response.use(async (response) => {
-//   return Promise.resolve(response);
-// }, async (error) => {
-//   return Promise.reject(error);
-// });
 
 function camelizeKeys(obj) {
   if (_.isPlainObject(obj)) {
@@ -66,5 +51,3 @@ function snakeCaseizeKeys(obj) {
     obj.forEach((o) => snakeCaseizeKeys(o));
   }
 }
-
-// export default axiosMiddleware(axiosClient);
