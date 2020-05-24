@@ -26,7 +26,9 @@ class Header extends Component {
       const hiveIsLive = new Date(activeQuestion.startTime) <= Date.now();
 
       if (hiveIsLive) {
-        return (<span>The hive is <b className="green">live</b> with {activeHiveCount.toLocaleString()} minds</span>)
+        return (
+          <span className="center-content">The hive is <b className="green">live</b> with {activeHiveCount.toLocaleString()} minds</span>
+        );
       } else {
         return `The hive is buzzing with ${activeHiveCount.toLocaleString()} minds`;
       }

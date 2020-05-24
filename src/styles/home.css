@@ -15,12 +15,21 @@
   padding: 0 80px;
 }
 
-.big-text {
-  font-weight: bold;
-  margin: 20px 0;
-}
-
 .label {
   padding-bottom: 5px;
   border-bottom: 2px solid #ddd;
+}
+
+@media only screen and (max-width: 800px) {
+  .right-column {
+    padding: 0 5px;
+  }
+  .left-column {
+    display: none;
+  }
+  .home-body {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+  }
 }
