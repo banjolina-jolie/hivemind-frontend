@@ -10,7 +10,7 @@ import '../styles/login-overlay.css';
 
 function LoginOverlay({ submitLogin }) {
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState('b@b.com'); // TODO: ''
+  const [email, setEmail] = useState(''); // TODO: ''
   const [password, setPassword] = useState('123123'); // TODO: ''
 
   const target = useRef(null);

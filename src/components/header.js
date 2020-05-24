@@ -21,21 +21,25 @@ class Header extends Component {
 
   renderCenterContent() {
     const { activeQuestion, activeHiveCount } = this.props;
+    let centerContent = '';
 
     if (activeQuestion && !activeQuestion.endTime) {
       const hiveIsLive = new Date(activeQuestion.startTime) <= Date.now();
 
       if (hiveIsLive) {
-        return (
-          <span className="center-content">The hive is <b className="green">live</b> with {activeHiveCount.toLocaleString()} minds</span>
+        centerContent = (
+          <span>
+            The hive is <b className="green">live</b> with {activeHiveCount.toLocaleString()} minds
+          </span>
         );
       } else {
-        return `The hive is buzzing with ${activeHiveCount.toLocaleString()} minds`;
+        centerContent = `The hive is buzzing with ${activeHiveCount.toLocaleString()} minds`;
       }
     } else {
-      return 'The hive is sleeping';
+      centerContent = 'The hive is sleeping';
     }
 
+    return ( <div className="center-content">{centerContent}</div> );
   }
 
   render() {
