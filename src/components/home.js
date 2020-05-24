@@ -13,6 +13,10 @@ import { fetchUser, fetchHomeData } from '../reducer';
 
 class Home extends Component {
 
+  componentWillUnmount() {
+    clearInterval(this.refreshTimer);
+  }
+
   componentDidMount() {
     if (!this.props.user && localStorage.getItem('authToken')) {
       this.props.fetchUser();
@@ -21,6 +25,12 @@ class Home extends Component {
     if (!this.props.homeData) {
       this.props.fetchHomeData();
     }
+
+    clearInterval(this.refreshTimer);
+
+    this.refreshTimer = setInterval(() => {
+      this.forceUpdate();
+    }, 1000);
   }
 
   render() {
@@ -29,7 +39,7 @@ class Home extends Component {
 
     return (
       <div>
-        <Header centerContent={`The hive is live with  ${activeHiveCount.toLocaleString()} minds`}/>
+        <Header activeQuestion={activeQuestion}/>
 
         <div className="home-body">
           <div className="left-column">
@@ -60,8 +70,8 @@ const mapStateToProps = state => {
 
   return {
     activeHiveCount,
-    previousQuestions,
     activeQuestion,
+    previousQuestions,
     user,
   };
 };

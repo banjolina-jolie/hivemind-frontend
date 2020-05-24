@@ -19,8 +19,25 @@ class Header extends Component {
     }
   }
 
+  renderCenterContent() {
+    const { activeQuestion, activeHiveCount } = this.props;
+
+    if (activeQuestion && !activeQuestion.endTime) {
+      const hiveIsLive = new Date(activeQuestion.startTime) <= Date.now();
+
+      if (hiveIsLive) {
+        return (<span>The hive is <b className="green">live</b> with {activeHiveCount.toLocaleString()} minds</span>)
+      } else {
+        return `The hive is buzzing with ${activeHiveCount.toLocaleString()} minds`;
+      }
+    } else {
+      return 'The hive is sleeping';
+    }
+
+  }
+
   render() {
-    const { centerContent, user } = this.props;
+    const { activeQuestion, user } = this.props;
 
     return (
       <div className="app-header">
@@ -28,7 +45,9 @@ class Header extends Component {
           <b>Hivemind</b>
         </Link>
 
-        <div>{centerContent}</div>
+        <div>
+          {this.renderCenterContent()}
+        </div>
 
         {user ? <LoggedInOverlay /> : (
           <div>
@@ -42,9 +61,11 @@ class Header extends Component {
 }
 
 const mapStateToProps = state => {
-  const { user } = state;
+  const { activeHiveCount, activeQuestion, user } = state;
 
   return {
+    activeHiveCount,
+    activeQuestion,
     user,
   };
 };

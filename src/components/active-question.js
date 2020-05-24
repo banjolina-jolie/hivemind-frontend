@@ -158,7 +158,7 @@ class ActiveQuestion extends Component {
 
     return (
       <div>
-        your vote: <input
+        your vote for next word: <input
           onChange={e => this.setState({
             text: e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase(),
           })}
